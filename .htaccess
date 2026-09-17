@@ -1,0 +1,8 @@
+# InfinityFree / shared-hosting Laravel document-root bridge.
+# InfinityFree serves htdocs as the document root, while Laravel expects /public.
+# Keep the storage rule BEFORE the catch-all so public-disk uploads remain accessible.
+
+RewriteEngine On
+
+RewriteRule ^storage/(.*)$ /storage/app/public/$1 [END]
+RewriteRule (.*) /public/$1 [L]
