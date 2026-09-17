@@ -18,12 +18,15 @@ class LayananController extends Controller
     public function page(Request $request, $title = 'Layanan')
     {
         $u = $this->mahasiswa();
+        $w = WebSetting::first();
 
         return view('private.mahasiswa.menu-page', [
-            'w' => WebSetting::first(),
+            'w' => $w,
             'user' => $u,
             'spref' => $u?->prefix ?? 'mahasiswa.',
             'menus' => 'Layanan',
+            'pages' => $title,
+            'academy' => 'STIT Darul Ilmi Tasikmalaya',
             'title' => $title,
         ]);
     }
@@ -31,25 +34,34 @@ class LayananController extends Controller
     public function cutiAkademik()
     {
         $u = $this->mahasiswa();
+        $w = WebSetting::first();
+
         return view('private.mahasiswa.layanan.cuti-akademik', [
-            'w' => WebSetting::first(),
+            'w' => $w,
             'user' => $u,
             'spref' => $u?->prefix ?? 'mahasiswa.',
+            'menus' => 'Layanan',
+            'pages' => 'Cuti Akademik',
+            'academy' => 'STIT Darul Ilmi Tasikmalaya',
         ]);
     }
 
     public function suratAktifKuliah()
     {
         $u = $this->mahasiswa();
+        $w = WebSetting::first();
         $jabatanDosen = collect([
             (object)['id' => 'ketua', 'name' => 'Ketua STIT Darul Ilmi Tasikmalaya'],
             (object)['id' => 'wakil-ketua', 'name' => 'Wakil Ketua STIT Darul Ilmi Tasikmalaya'],
         ]);
 
         return view('private.mahasiswa.layanan.surat-aktif-kuliah', [
-            'w' => WebSetting::first(),
+            'w' => $w,
             'user' => $u,
             'spref' => $u?->prefix ?? 'mahasiswa.',
+            'menus' => 'Layanan',
+            'pages' => 'Surat Keterangan Aktif Kuliah',
+            'academy' => 'STIT Darul Ilmi Tasikmalaya',
             'jabatanDosen' => $jabatanDosen,
         ]);
     }
