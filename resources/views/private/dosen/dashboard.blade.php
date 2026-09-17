@@ -67,8 +67,7 @@
                         $waktuAttributes = $waktu ? $waktu->getAttributes() : [];
                         $jadwalAttributes = $item->getAttributes();
 
-                        // Gunakan jam yang benar-benar tersimpan pada data Jadwal Kuliah,
-                        // lalu fallback ke master Waktu Kuliah jika kolom jam berada di relasi tersebut.
+                        // Sumber utama adalah master Waktu Kuliah yang dipilih pada Jadwal Kuliah.
                         $ambilJam = function (array $attributes, array $keys) {
                             foreach ($keys as $key) {
                                 if (array_key_exists($key, $attributes) && filled($attributes[$key])) {
@@ -79,20 +78,33 @@
                         };
 
                         $mulai = $ambilJam($jadwalAttributes, ['jam_mulai', 'waktu_mulai', 'start_time', 'start', 'mulai', 'time_start']);
-                        $selesai = $ambilJam($jadwalAttributes, ['jam_selesai', 'waktu_selesai', 'end_time', 'end', 'selesai', 'time_end']);
+                        $selesai = $ambilJam($jadwalAttributes, ['jam_selesai', 'waktu_selesai', 'end_time', 'end', 'selesai', 'time_end', 'time_ended']);
 
                         if (!$mulai) {
                             $mulai = $ambilJam($waktuAttributes, ['jam_mulai', 'waktu_mulai', 'start_time', 'start', 'mulai', 'time_start']);
                         }
                         if (!$selesai) {
-                            $selesai = $ambilJam($waktuAttributes, ['jam_selesai', 'waktu_selesai', 'end_time', 'end', 'selesai', 'time_end']);
+                            // Kolom database master Waktu Kuliah adalah time_ended.
+                            $selesai = $ambilJam($waktuAttributes, ['jam_selesai', 'waktu_selesai', 'end_time', 'end', 'selesai', 'time_end', 'time_ended']);
                         }
 
-                        // Jika master Waktu Kuliah menyimpan satu label jam, tampilkan label tersebut.
+                        // Jika waktu belum ditemukan sebagai pasangan jam, gunakan nama master sebagai fallback.
                         $labelWaktu = $ambilJam($jadwalAttributes, ['jam', 'waktu', 'time', 'range_jam', 'jam_kuliah']);
                         if (!$labelWaktu) {
                             $labelWaktu = $ambilJam($waktuAttributes, ['jam', 'waktu', 'time', 'range_jam', 'jam_kuliah', 'name']);
                         }
+
+                        // Tampilkan HH:mm agar konsisten dengan input/master jam kuliah.
+                        $formatJam = function ($value) {
+                            if (!$value) return null;
+                            try {
+                                return \Carbon\Carbon::parse($value)->format('H:i');
+                            } catch (\Throwable $e) {
+                                return $value;
+                            }
+                        };
+                        $mulai = $formatJam($mulai);
+                        $selesai = $formatJam($selesai);
 
                         $kelas = $item->kelas->pluck('name')->filter()->join(', ');
                         $metode = $item->metode ?? data_get($item, 'method') ?? '-';
