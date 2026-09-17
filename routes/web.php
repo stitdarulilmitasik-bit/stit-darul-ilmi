@@ -36,7 +36,7 @@ Route::get('/siakad/pembayaran', fn() => redirect()->route('auth.render-signin')
 Route::get('/perpustakaan', [App\Http\Controllers\PublicInfoController::class, 'show'])->defaults('page', 'perpustakaan')->name('root.perpustakaan');
 Route::get('/laboratorium', [App\Http\Controllers\PublicInfoController::class, 'show'])->defaults('page', 'laboratorium')->name('root.laboratorium');
 Route::get('/kemahasiswaan', [App\Http\Controllers\PublicInfoController::class, 'show'])->defaults('page', 'kemahasiswaan')->name('root.kemahasiswaan');
-Route::get('/keuangan', [App\Http\Controllers\PublicInfoController::class, 'show'])->defaults('page', 'keuangan')->name('root.keuangan');
+Route::get('/keuangan', [App\Http\Controllers\PublicInfoController::class, 'show'])->defaults('page', 'keuangan');
 
 Route::get('/welcome', [App\Http\Controllers\RootController::class, 'renderWelcome'])->name('root.welcome');
 Route::post('/api/setup', [App\Http\Controllers\SetupController::class, 'processSetup'])->name('setup.process');
@@ -46,8 +46,10 @@ Route::middleware(['guest', 'first.setup'])->group(function () {
     Route::post('/signin', [App\Http\Controllers\AuthController::class, 'handleSignin'])->name('auth.handle-signin');
     Route::get('/forgot', [App\Http\Controllers\AuthController::class, 'renderForgot'])->name('auth.render-forgot');
     Route::post('/forgot', [App\Http\Controllers\AuthController::class, 'handleForgot'])->name('auth.handle-forgot');
-    Route::get('/logout', [App\Http\Controllers\AuthController::class, 'handleLogout'])->name('auth.handle-logout');
 });
+
+// Logout must remain accessible to authenticated users.
+Route::get('/logout', [App\Http\Controllers\AuthController::class, 'handleLogout'])->name('auth.handle-logout');
 
 Route::get('/error/verify', [App\Http\Controllers\Root\ErrorController::class, 'ErrorVerify'])->name('error.verify');
 Route::get('/error/access', [App\Http\Controllers\Root\ErrorController::class, 'ErrorAccess'])->name('error.access');
