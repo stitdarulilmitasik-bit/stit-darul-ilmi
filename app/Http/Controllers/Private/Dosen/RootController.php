@@ -14,6 +14,7 @@ use App\Models\Akademik\MataKuliah;
 use App\Models\Akademik\KRS;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RootController extends Controller
 {
@@ -66,7 +67,7 @@ class RootController extends Controller
                 'domicile_subdistrict' => 'nullable|required_if:domicile_same,No|string|max:100',
                 'domicile_city' => 'nullable|required_if:domicile_same,No|string|max:100',
                 'domicile_province' => 'nullable|required_if:domicile_same,No|string|max:100',
-                'domicile_poscode' => 'nullable|required_if:domicile_same,No|string|max:10',
+                'domicile_poscode' => 'nullable|string|max:10',
                 'edu1_type' => 'required|in:SMA/SMK,Diploma,Sarjana,Magister,Doktor',
                 'edu1_place' => 'required|string|max:255',
                 'edu1_major' => 'required|string|max:255',
@@ -131,9 +132,6 @@ class RootController extends Controller
               ->orWhere('dosen3_id', $user->id);
         })->with('programStudi')->get();
 
-        // Tampilkan jadwal jika dosen tercatat langsung pada jadwal ATAU
-        // mata kuliahnya tercatat sebagai mata kuliah yang diampu dosen.
-        // Ini mengakomodasi data jadwal lama maupun jadwal yang dibuat dari menu Dosen.
         $mataKuliahIds = $mataKuliah->pluck('id');
         $jadwal = JadwalKuliah::with(['mataKuliah.programStudi', 'ruang', 'jenisKelas', 'waktuKuliah', 'kelas'])
             ->where(function ($q) use ($user, $mataKuliahIds) {
@@ -196,5 +194,51 @@ class RootController extends Controller
             'activities' => $activities,
             'jadwalSaya' => $jadwal,
         ]);
+    }
+
+    public function exportJadwalPdf()
+    {
+        $user = Auth::guard('dosen')->user();
+        abort_unless($user, 403);
+
+        $mataKuliahIds = MataKuliah::where(function ($q) use ($user) {
+            $q->where('dosen1_id', $user->id)
+              ->orWhere('dosen2_id', $user->id)
+              ->orWhere('dosen3_id', $user->id);
+        })->pluck('id');
+
+        $jadwalSaya = JadwalKuliah::with(['mataKuliah', 'ruang', 'waktuKuliah', 'kelas'])
+            ->where(function ($q) use ($user, $mataKuliahIds) {
+                $q->where('dosen_id', $user->id);
+                if ($mataKuliahIds->isNotEmpty()) {
+                    $q->orWhereIn('matkul_id', $mataKuliahIds);
+                }
+            })
+            ->orderByRaw('CASE WHEN tanggal IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('tanggal')
+            ->orderBy('waktu_kuliah_id')
+            ->get();
+
+        $logo = null;
+        $logoCandidates = [
+            public_path('storage/images/logo.png'),
+            public_path('storage/images/logo.jpg'),
+            public_path('storage/images/logo.jpeg'),
+            public_path('images/logo.png'),
+            public_path('images/logo.jpg'),
+            public_path('images/logo.jpeg'),
+        ];
+        foreach ($logoCandidates as $candidate) {
+            if (is_file($candidate)) {
+                $mime = mime_content_type($candidate) ?: 'image/png';
+                $logo = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($candidate));
+                break;
+            }
+        }
+
+        $pdf = Pdf::loadView('private.dosen.jadwal-pdf', compact('user', 'jadwalSaya', 'logo'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('Jadwal-Kuliah-Dosen-' . str()->slug($user->name) . '.pdf');
     }
 }
