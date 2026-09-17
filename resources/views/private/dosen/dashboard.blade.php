@@ -40,8 +40,8 @@
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <div>
-            <h5 class="card-title mb-1">Jadwal Saya</h5>
-            <div class="text-muted small">Jadwal perkuliahan yang ditugaskan kepada Anda</div>
+            <h5 class="card-title mb-1">Jadwal Kuliah Saya</h5>
+            <div class="text-muted small">Jadwal perkuliahan untuk mata kuliah yang Anda ampu</div>
         </div>
         <a href="{{ route('dosen.akademik.jadwal') }}" class="btn btn-primary btn-sm">Kelola Jadwal</a>
     </div>
@@ -49,30 +49,45 @@
         <table class="table table-vcenter card-table">
             <thead>
                 <tr>
-                    <th>Tanggal</th><th>Hari</th><th>Jam</th><th>Mata Kuliah</th><th>Kelas</th><th>Ruang</th><th>Metode</th>
+                    <th>Mata Kuliah</th>
+                    <th>Tanggal</th>
+                    <th>Hari</th>
+                    <th>Jam Kuliah</th>
+                    <th>Kelas</th>
+                    <th>Ruang</th>
+                    <th>Metode</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($jadwalSaya as $item)
                     @php
-                        $tanggal = data_get($item, 'date') ?? data_get($item, 'tanggal') ?? data_get($item, 'schedule_date');
-                        $hari = data_get($item, 'day') ?? data_get($item, 'hari');
-                        $mulai = data_get($item, 'waktuKuliah.start') ?? data_get($item, 'waktuKuliah.jam_mulai') ?? data_get($item, 'waktuKuliah.start_time') ?? data_get($item, 'start_time');
-                        $selesai = data_get($item, 'waktuKuliah.end') ?? data_get($item, 'waktuKuliah.jam_selesai') ?? data_get($item, 'waktuKuliah.end_time') ?? data_get($item, 'end_time');
+                        $tanggal = $item->tanggal ?? null;
+                        $hari = $item->hari ?? null;
+                        $mulai = data_get($item, 'waktuKuliah.jam_mulai') ?? data_get($item, 'waktuKuliah.start') ?? data_get($item, 'waktuKuliah.start_time');
+                        $selesai = data_get($item, 'waktuKuliah.jam_selesai') ?? data_get($item, 'waktuKuliah.end') ?? data_get($item, 'waktuKuliah.end_time');
                         $kelas = $item->kelas->pluck('name')->filter()->join(', ');
-                        $metode = data_get($item, 'method') ?? data_get($item, 'metode') ?? data_get($item, 'jenisKelas.name') ?? '-';
+                        $metode = $item->metode ?? data_get($item, 'method') ?? '-';
                     @endphp
                     <tr>
+                        <td>
+                            <div class="fw-semibold">{{ $item->mataKuliah->name ?? '-' }}</div>
+                            @if(!empty($item->mataKuliah->code))
+                                <div class="text-muted small">{{ $item->mataKuliah->code }}</div>
+                            @endif
+                        </td>
                         <td>{{ $tanggal ? \Carbon\Carbon::parse($tanggal)->locale('id')->translatedFormat('d F Y') : '-' }}</td>
                         <td>{{ $hari ?: ($tanggal ? \Carbon\Carbon::parse($tanggal)->locale('id')->translatedFormat('l') : '-') }}</td>
-                        <td>{{ $mulai || $selesai ? trim(($mulai ?: '-') . ' - ' . ($selesai ?: '-')) : '-' }}</td>
-                        <td><strong>{{ $item->mataKuliah->name ?? '-' }}</strong></td>
+                        <td>
+                            <span class="badge bg-blue-lt">
+                                {{ $mulai || $selesai ? trim(($mulai ?: '-') . ' - ' . ($selesai ?: '-')) : '-' }}
+                            </span>
+                        </td>
                         <td>{{ $kelas ?: '-' }}</td>
                         <td>{{ $item->ruang->name ?? '-' }}</td>
-                        <td><span class="badge bg-blue-lt">{{ $metode }}</span></td>
+                        <td><span class="badge bg-green-lt">{{ $metode }}</span></td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="text-center py-4 text-muted">Belum ada jadwal kuliah yang ditugaskan kepada Anda.</td></tr>
+                    <tr><td colspan="7" class="text-center py-4 text-muted">Belum ada jadwal kuliah untuk mata kuliah yang Anda ampu.</td></tr>
                 @endforelse
             </tbody>
         </table>
