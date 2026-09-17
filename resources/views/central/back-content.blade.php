@@ -8,6 +8,11 @@
     .recent-activity{max-height:400px;overflow-y:auto}
     .activity-item{padding:1rem;border-left:3px solid #206bc4;margin-bottom:1rem;background:#f8f9fa;border-radius:0 8px 8px 0}
     .chart-container{position:relative;height:360px}
+    .stit-dashboard-footer{text-align:center!important}
+    .stit-dashboard-footer .container-xl{display:flex;justify-content:center}
+    .stit-dashboard-footer .stit-footer-content{width:100%;text-align:center;padding:.75rem 0}
+    .stit-dashboard-footer .stit-footer-title{font-weight:600;color:var(--tblr-body-color)}
+    .stit-dashboard-footer .stit-footer-copy{font-size:.875rem;color:var(--tblr-secondary)}
 </style>
 @endsection
 
@@ -99,15 +104,32 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const el = document.getElementById('studentDistributionChart');
-    if (!el) return;
-    new Chart(el.getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: @json($distribution->keys()->values()),
-            datasets: [{ label: 'Mahasiswa', data: @json($distribution->values()->values()) }]
-        },
-        options: { responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
-    });
+    if (el && typeof Chart !== 'undefined') {
+        new Chart(el.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: @json($distribution->keys()->values()),
+                datasets: [{ label: 'Mahasiswa', data: @json($distribution->values()->values()) }]
+            },
+            options: { responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+        });
+    }
+
+    // Ganti footer bawaan template dengan footer resmi STIT Darul Ilmi.
+    const oldFooter = document.querySelector('footer.footer');
+    if (oldFooter) {
+        oldFooter.classList.add('stit-dashboard-footer');
+        oldFooter.innerHTML = `
+            <div class="container-xl">
+                <div class="stit-footer-content">
+                    <div class="stit-footer-title">STIT Darul Ilmi Tasikmalaya</div>
+                    <div class="stit-footer-copy">Copyright © ${new Date().toLocaleDateString('id-ID', {month:'long', year:'numeric'})} STIT Darul Ilmi. All rights reserved.</div>
+                </div>
+            </div>`;
+    }
+
+    // Hilangkan kontrol demo/template yang tidak diperlukan pada dashboard.
+    document.querySelectorAll('.settings').forEach(el => el.remove());
 });
 </script>
 @endsection
