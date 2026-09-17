@@ -92,8 +92,15 @@ class KRSController extends Controller
             $mahasiswa = Mahasiswa::find($request->mahasiswa_id);
             $ipkSebelumnya = $this->getIPKSebelumnya($mahasiswa->id, $request->semester);
 
+            // Gunakan NIM sebagai identitas mahasiswa pada kode KRS.
+            // Jangan gunakan $mahasiswa->code karena field tersebut dapat berisi kode acak seperti Jx7Uce.
+            $nim = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $mahasiswa->numb_nim);
+            if ($nim === '') {
+                throw new \RuntimeException('NIM mahasiswa tidak tersedia sehingga kode KRS tidak dapat dibuat.');
+            }
+
             $krs = KRS::create([
-                'code' => 'KRS-' . date('Ymd') . '-' . $mahasiswa->code . '-S' . $request->semester,
+                'code' => 'KRS-' . date('Ymd') . '-' . $nim . '-S' . $request->semester,
                 'mahasiswa_id' => $request->mahasiswa_id,
                 'taka_id' => $request->tahun_akademik_id,
                 'semester' => $request->semester,
