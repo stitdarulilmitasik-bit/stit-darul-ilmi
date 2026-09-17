@@ -1,9 +1,15 @@
-@extends('core-themes.core-backpage')
+﻿@extends('core-themes.core-backpage')
 
 @section('custom-css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <style>
+	#dosenTable th:nth-child(2),
+	#dosenTable td:nth-child(2) {
+  	  min-width: 260px;
+  	  width: 260px;
+  	  white-space: nowrap;
+	}
         /* Stats cards */
         .bg-light-primary {
             background-color: rgba(67, 94, 190, 0.1);
@@ -213,17 +219,17 @@
                                         @enderror
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="type" class="form-label">Departemen</label>
+                                        <label for="type" class="form-label">Status Kerja</label>
                                         <select class="form-select" name="type" id="type" required>
-                                            <option value="">Pilih Departemen</option>
-                                            <option value="0">Dosen Non-Aktif</option>
-                                            <option value="1">Dosen Aktif</option>
+                                            <option value="">Pilih Status Kerja</option>
+                                            <option value="0">Tidak Aktif</option>
+                                            <option value="1">Aktif</option>
                                         </select>
                                         @error('type')
                                             <small class="text-danger">{{ $message }}</small>
                                         @enderror
                                     </div>
-                                    <div class="col-12 d-flex justify-content-end">
+                                    <div class="col-md-6 mb-3">                                        <label for="status_dosen" class="form-label">Status Dosen</label>                                        <select class="form-select" name="status_dosen" id="status_dosen" required>                                            <option value="">Pilih Status Dosen</option>                                            <option value="Dosen Tetap">Dosen Tetap</option>                                            <option value="Dosen Tidak Tetap">Dosen Tidak Tetap</option>                                        </select>                                        @error('status_dosen')                                            <small class="text-danger">{{ $message }}</small>                                        @enderror                                    </div>                                    <div class="col-12 d-flex justify-content-end">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="fas fa-save me-2"></i>Simpan
                                         </button>
@@ -235,14 +241,14 @@
                     
                     <!-- Table -->
                     <div class="table-responsive mt-3">
-                        <table class="table">
+                        <table class="table" id="dosenTable">
                             <thead>
                                 <tr>
                                     <th class="text-center">No</th>
                                     <th>Nama</th>
                                     <th>Email</th>
                                     <th>Telepon</th>
-                                    <th>Status</th>
+                                    <th>Status Kerja</th>                                    <th>Status Dosen</th>
                                     <th class="text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -253,7 +259,7 @@
                                         <td data-label="Nama">{{ $item->name }}</td>
                                         <td data-label="Email">{{ $item->email }}</td>
                                         <td data-label="Telepon">{{ $item->phone }}</td>
-                                        <td data-label="Status">{{ $item->type }}</td>
+                                        <td data-label="Status Kerja">{{ $item->type }}</td>                                        <td data-label="Status Dosen">{{ $item->status_dosen }}</td>
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <a href="{{ route($spref.'pengguna.dosen-views', $item->code) }}" class="btn btn-sm btn-secondary" data-bs-toggle="tooltip" title="Lihat Pengguna">
@@ -363,16 +369,28 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="edit_type{{ $item->code }}" class="form-label">Departemen</label>
+                                    <label for="edit_type{{ $item->code }}" class="form-label">Status Kerja</label>
                                     <select class="form-select" name="type" id="edit_type{{ $item->code }}" required>
-                                        <option value="">Pilih Departemen</option>
-                                        <option value="0" {{ $item->raw_type == 0 ? 'selected' : '' }}>Dosen Non-Aktif</option>
-                                        <option value="1" {{ $item->raw_type == 1 ? 'selected' : '' }}>Dosen Aktif</option>
+                                        <option value="">Pilih Status Kerja</option>
+                                        <option value="0" {{ $item->raw_type == 0 ? 'selected' : '' }}>Tidak Aktif</option>
+                                        <option value="1" {{ $item->raw_type == 1 ? 'selected' : '' }}>Aktif</option>
                                     </select>
                                     @error('type')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
                                 </div>
+<!-- TAMBAHKAN DI SINI -->
+<div class="col-md-6 mb-3">
+    <label for="edit_status_dosen{{ $item->code }}" class="form-label">Status Dosen</label>
+    <select class="form-select" name="status_dosen" id="edit_status_dosen{{ $item->code }}" required>
+        <option value="">Pilih Status Dosen</option>
+        <option value="Dosen Tetap" {{ $item->status_dosen == 'Dosen Tetap' ? 'selected' : '' }}>Dosen Tetap</option>
+        <option value="Dosen Tidak Tetap" {{ $item->status_dosen == 'Dosen Tidak Tetap' ? 'selected' : '' }}>Dosen Tidak Tetap</option>
+    </select>
+    @error('status_dosen')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+</div>
                             </div>
                         </div>
                         <div class="modal-footer">
