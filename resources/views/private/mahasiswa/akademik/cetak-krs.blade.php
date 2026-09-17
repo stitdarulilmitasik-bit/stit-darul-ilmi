@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cetak KRS - {{ $mahasiswa->name ?? $mahasiswa->numb_nim }}</title>
 <style>
-@page { size: A4 portrait; margin: 15mm; }
-body { font-family: Arial, sans-serif; color:#111; font-size:12px; }
-.no-print { margin-bottom:15px; }
-.kop { width:100%; border-bottom:3px solid #111; padding-bottom:9px; margin-bottom:15px; }
+@page { size: A4 portrait; margin: 10mm 15mm 15mm; }
+body { font-family: Arial, sans-serif; color:#111; font-size:12px; margin:0; }
+.no-print { display:none; }
+.kop { width:100%; border-bottom:3px solid #111; padding-bottom:7px; margin-top:0; margin-bottom:12px; }
 .kop-table { width:100%; border-collapse:collapse; }
 .kop-table td { border:0; padding:0; }
 .logo { width:105px; text-align:center; vertical-align:middle; }
-.logo img { width:88px; height:88px; object-fit:contain; }
-.kop-text { text-align:center; line-height:1.35; }
+.logo img { width:82px; height:82px; object-fit:contain; }
+.kop-text { text-align:center; line-height:1.3; }
 .kop-text .line1 { font-size:15px; font-weight:bold; }
 .kop-text .line2 { font-size:18px; font-weight:bold; }
 .kop-text .line3 { font-size:10px; font-weight:bold; }
@@ -25,11 +25,9 @@ th { background:#eee; }
 .text-center{text-align:center}.text-right{text-align:right}
 .signature { margin-top:35px; width:100%; display:flex; justify-content:flex-end; }
 .signature-box { width:220px; text-align:center; }
-@media print { .no-print { display:none; } }
 </style>
 </head>
 <body>
-<div class="no-print"><button onclick="window.print()">Cetak / Print</button></div>
 <div class="kop">
     <table class="kop-table">
         <tr>
@@ -86,6 +84,5 @@ th { background:#eee; }
 <tfoot><tr><th colspan="3" class="text-right">Total SKS</th><th class="text-center">{{ $krs->sum('sks') }}</th><th colspan="2"></th></tr></tfoot>
 </table>
 <div class="signature"><div class="signature-box"><p>Mengetahui,<br>Dosen Pembimbing Akademik</p><br><br><br><strong>{{ $krsHeader->dosenPA->name ?? '________________________' }}</strong></div></div>
-<script>window.addEventListener('load', function(){ setTimeout(function(){ window.print(); }, 350); });</script>
 </body>
 </html>
