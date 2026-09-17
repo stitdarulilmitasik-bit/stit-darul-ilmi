@@ -131,9 +131,13 @@ class RootController extends Controller
               ->orWhere('dosen3_id', $user->id);
         })->with('programStudi')->get();
 
+        // Jadwal dashboard mengikuti mata kuliah yang memang diampu dosen login.
+        $mataKuliahIds = $mataKuliah->pluck('id');
         $jadwal = JadwalKuliah::with(['mataKuliah.programStudi', 'ruang', 'jenisKelas', 'waktuKuliah', 'kelas'])
-            ->where('dosen_id', $user->id)
-            ->latest()
+            ->whereIn('matkul_id', $mataKuliahIds)
+            ->orderByRaw('CASE WHEN tanggal IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('tanggal')
+            ->orderBy('waktu_kuliah_id')
             ->get();
 
         $distribution = $mataKuliah->groupBy(function ($item) {
