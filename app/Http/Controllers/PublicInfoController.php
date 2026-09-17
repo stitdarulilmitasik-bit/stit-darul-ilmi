@@ -28,16 +28,24 @@ class PublicInfoController extends Controller
             ],
             'struktur-organisasi' => [
                 'title' => 'Struktur Organisasi',
-                'heading' => 'Struktur Organisasi',
+                'heading' => 'Bagan Struktur Organisasi STIT Darul Ilmi Tasikmalaya',
                 'structure' => [
-                    'Ketua/Rektor',
-                    'Wakil Ketua/Wakil Rektor',
-                    'Senat Perguruan Tinggi',
-                    'Program Studi',
-                    'Bagian Administrasi Akademik',
-                    'Bagian Keuangan dan Umum',
-                    'Lembaga Penelitian dan Pengabdian kepada Masyarakat',
-                    'Unit Penunjang Akademik',
+                    'pembina' => ['Prof. Dr. H. Ah. Fathonih, M.Ag.'],
+                    'ketua' => ['Dr. H. Dudung Rahmat Hidayat, M.Pd.'],
+                    'wakil' => [
+                        ['label' => 'Pembantu Ketua I', 'name' => 'Dr. Asep Rusmana, M.Ag.'],
+                        ['label' => 'Pembantu Ketua II', 'name' => 'Aa Sudirman, M.Pd.I.'],
+                        ['label' => 'Pembantu Ketua III', 'name' => 'Drs. Emin Salimin, M.A.'],
+                    ],
+                    'prodi' => [
+                        ['label' => 'Ketua Prodi MPI', 'name' => 'H. Angga Yogaswara, Lc, M.Pd.I.'],
+                        ['label' => 'Sekretaris Prodi MPI', 'name' => 'Aceng Kosim, M.Pd.'],
+                    ],
+                    'unit' => [
+                        ['label' => 'BAAK', 'name' => 'Drs. Nasihudin, M.Pd.I.'],
+                        ['label' => 'BAUK', 'name' => 'Wina Munawaroh, S.Ak.'],
+                        ['label' => 'Kepala Perpustakaan', 'name' => 'Dedeh Holipah, M.Pd.'],
+                    ],
                 ],
             ],
             'fasilitas' => [
@@ -72,6 +80,7 @@ class PublicInfoController extends Controller
             'academy' => $webs ? $webs->school_apps . ' by ' . $webs->school_name : 'SIAKAD',
             'info' => $pages[$page],
             'user' => auth()->user() ?: auth()->guard('dosen')->user() ?: auth()->guard('mahasiswa')->user(),
+            'spref' => 'web-admin.',
         ]);
     }
 }
