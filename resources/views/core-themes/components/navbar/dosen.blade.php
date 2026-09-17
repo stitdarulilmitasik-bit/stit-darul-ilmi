@@ -14,14 +14,22 @@
 <li class="nav-item dropdown">
     <a class="nav-link {{ Route::is('dosen.akademik.*') ? 'active' : '' }} dropdown-toggle" href="#navbar-dosen-akademik" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
         <span class="nav-link-icon d-md-none d-lg-inline-block">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 9l-10 -4l-10 4l10 -4"/><path d="M6 10.6v5.4a6 6 0 0 0 12 0v-5.4"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icon-tabler-school"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 9l-10 -4l-10 4l10 4l10 -4v6"/><path d="M6 10.6v5.4a6 6 0 0 0 12 0v-5.4"/></svg>
         </span>
-        <span class="nav-link-title">Akademik</span>
+        <span class="nav-link-title">Master Akademik</span>
     </a>
     <div class="dropdown-menu">
-        <a class="dropdown-item {{ Route::is('dosen.akademik.master') ? 'active' : '' }}" href="{{ route('dosen.akademik.master') }}">Mata Kuliah yang Saya Ampu</a>
-        <a class="dropdown-item {{ Route::is('dosen.akademik.jadwal') ? 'active' : '' }}" href="{{ route('dosen.akademik.jadwal') }}">Jadwal Kuliah</a>
-        <a class="dropdown-item {{ Route::is('dosen.akademik.krs') ? 'active' : '' }}" href="{{ route('dosen.akademik.krs') }}">Persetujuan KRS</a>
-        <a class="dropdown-item {{ Route::is('dosen.akademik.nilai') ? 'active' : '' }}" href="{{ route('dosen.akademik.nilai') }}">Input / Update Nilai</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.taka-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.taka-render') }}">Tahun Akademik</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.fakultas-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.fakultas-render') }}">Fakultas</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.prodi-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.prodi-render') }}">Program Studi</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.kurikulum-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.kurikulum-render') }}">Kurikulum</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.mata-kuliah-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.mata-kuliah-render') }}">Mata Kuliah</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.jenis-kelas-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.jenis-kelas-render') }}">Jenis Kelas</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.kelas-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.kelas-render') }}">Kelas</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.waktu-kuliah-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.waktu-kuliah-render') }}">Waktu Kuliah</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.jadwal-kuliah-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.jadwal-kuliah-render') }}">Jadwal Kuliah</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.krs-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.krs-render') }}">KRS (Kartu Rencana Studi)</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.nilai-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.nilai-render') }}">Nilai Mahasiswa</a>
+        <a class="dropdown-item {{ Route::is('dosen.akademik.khs-*') ? 'active' : '' }}" href="{{ route('dosen.akademik.khs-render') }}">KHS (Kartu Hasil Studi)</a>
     </div>
 </li>
