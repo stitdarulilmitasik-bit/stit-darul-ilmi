@@ -36,8 +36,7 @@ Route::group(['prefix' => 'mahasiswa', 'middleware' => ['checkUser:Mahasiswa Akt
     Route::prefix('layanan')->name('layanan.')->group(function () {
         Route::get('/transkrip', [App\Http\Controllers\Private\Mahasiswa\LayananController::class, 'transkripNilai'])->name('transkrip');
         Route::get('/transkrip/cetak', [App\Http\Controllers\Private\Mahasiswa\LayananController::class, 'cetakTranskrip'])->name('transkrip.cetak');
-        Route::get('/surat-keterangan', [App\Http\Controllers\Private\Mahasiswa\LayananController::class, 'suratKeterangan'])->name('surat-keterangan');
-        Route::post('/ajukan-surat', [App\Http\Controllers\Private\Mahasiswa\LayananController::class, 'ajukanSuratKeterangan'])->name('ajukan-surat');
+        Route::get('/surat-keterangan', [App\Http\Controllers\Private\Mahasiswa\LayananController::class, 'page'])->defaults('title', 'Surat Keterangan')->name('surat-keterangan');
         Route::get('/surat-aktif-kuliah', [App\Http\Controllers\Private\Mahasiswa\LayananController::class, 'suratAktifKuliah'])->name('surat-aktif-kuliah');
         Route::post('/surat-aktif-kuliah', [App\Http\Controllers\Private\Mahasiswa\LayananController::class, 'ajukanSuratAktifKuliah'])->name('ajukan-surat-aktif');
         Route::get('/legalisir', [App\Http\Controllers\Private\Mahasiswa\LayananController::class, 'legalisirDokumen'])->name('legalisir');
