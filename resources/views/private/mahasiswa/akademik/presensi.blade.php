@@ -1,8 +1,8 @@
-@extends('core-theme::layouts.app')
+@extends('core-themes.core-backpage')
 
 @section('title', 'Presensi')
 
-@push('styles')
+@section('custom-css')
 <style>
     .attendance-card {
         transition: all 0.2s ease-in-out;
@@ -12,9 +12,7 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
-    .progress-thin {
-        height: 6px;
-    }
+    .progress-thin { height: 6px; }
     .attendance-status {
         font-size: 0.75rem;
         font-weight: 600;
@@ -32,10 +30,7 @@
         align-items: center;
         margin-bottom: 0.5rem;
     }
-    .course-title {
-        font-weight: 600;
-        margin: 0;
-    }
+    .course-title { font-weight: 600; margin: 0; }
     .course-code {
         font-size: 0.8125rem;
         color: #6b7280;
@@ -50,10 +45,9 @@
         display: flex;
         gap: 1rem;
         margin-top: 0.75rem;
+        flex-wrap: wrap;
     }
-    .stat-item {
-        text-align: center;
-    }
+    .stat-item { text-align: center; }
     .stat-value {
         font-weight: 700;
         font-size: 1.125rem;
@@ -72,24 +66,21 @@
         color: #6b7280;
     }
 </style>
-@endpush
+@endsection
 
 @section('content')
 <div class="container-fluid">
-    <!-- Page title -->
     <div class="page-header d-print-none">
         <div class="row align-items-center">
             <div class="col">
-                <h2 class="page-title">
-                    Presensi Perkuliahan
-                </h2>
+                <h2 class="page-title">Presensi Perkuliahan</h2>
                 <div class="text-muted mt-1">
                     Semester {{ $currentSemester->nama }} - {{ $currentSemester->tahun_ajaran }}
                 </div>
             </div>
             <div class="col-auto ms-auto d-print-none">
                 <div class="btn-list">
-                    <a href="#" class="btn btn-outline-primary d-none d-sm-inline-block" onclick="window.print()">
+                    <a href="#" class="btn btn-outline-primary d-none d-sm-inline-block" onclick="window.print(); return false;">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                             <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
@@ -98,7 +89,7 @@
                         </svg>
                         Cetak Presensi
                     </a>
-                    <a href="#" class="btn btn-primary d-sm-none btn-icon" onclick="window.print()">
+                    <a href="#" class="btn btn-primary d-sm-none btn-icon" onclick="window.print(); return false;" aria-label="Cetak Presensi">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                             <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
@@ -120,16 +111,14 @@
                             <div class="empty-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
                                     <path d="M9 10l.01 0" />
                                     <path d="M15 10l.01 0" />
                                     <path d="M9.5 15.25a3.5 3.5 0 0 1 5 0" />
                                 </svg>
                             </div>
                             <p class="empty-title">Tidak ada data presensi</p>
-                            <p class="empty-subtitle text-muted">
-                                Belum ada data presensi untuk semester ini.
-                            </p>
+                            <p class="empty-subtitle text-muted">Belum ada data presensi untuk semester ini.</p>
                         </div>
                     </div>
                 </div>
@@ -143,21 +132,19 @@
                                     {{ $data['persentase'] }}%
                                 </span>
                             </div>
-                            
+
                             <div class="progress progress-thin mb-3">
                                 @php
-                                    $progressClass = $data['persentase'] >= 80 ? 'bg-success' : 
-                                                   ($data['persentase'] >= 60 ? 'bg-warning' : 'bg-danger');
+                                    $progressClass = $data['persentase'] >= 80 ? 'bg-success' : ($data['persentase'] >= 60 ? 'bg-warning' : 'bg-danger');
                                 @endphp
-                                <div class="progress-bar {{ $progressClass }}" 
-                                     role="progressbar" 
-                                     style="width: {{ $data['persentase'] }}%" 
-                                     aria-valuenow="{{ $data['persentase'] }}" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100">
-                                </div>
+                                <div class="progress-bar {{ $progressClass }}"
+                                     role="progressbar"
+                                     style="width: {{ $data['persentase'] }}%"
+                                     aria-valuenow="{{ $data['persentase'] }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"></div>
                             </div>
-                            
+
                             <div class="attendance-stats">
                                 <div class="stat-item">
                                     <div class="stat-value text-success">{{ $data['hadir'] }}</div>
@@ -180,7 +167,7 @@
                                     <div class="stat-label">Total</div>
                                 </div>
                             </div>
-                            
+
                             <div class="d-flex justify-content-end mt-3">
                                 <a href="{{ route('mahasiswa.akademik.detail-presensi', ['kode_mk' => $data['kode_mk']]) }}" class="btn btn-sm btn-outline-primary">
                                     Lihat Detail Presensi
@@ -195,21 +182,16 @@
 </div>
 @endsection
 
-@push('scripts')
+@section('custom-js')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add tooltips to progress bars
-        document.querySelectorAll('.progress').forEach(progress => {
-            progress.addEventListener('mousemove', function(e) {
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.progress').forEach(function (progress) {
+            progress.addEventListener('mousemove', function (e) {
                 const rect = this.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const percentage = Math.round((x / rect.width) * 100);
-                
-                // Show a tooltip with the percentage
-                // You can use a library like tippy.js for better tooltips
-                this.setAttribute('title', `${percentage}%`);
+                const percentage = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+                this.setAttribute('title', percentage + '%');
             });
         });
     });
 </script>
-@endpush
+@endsection
