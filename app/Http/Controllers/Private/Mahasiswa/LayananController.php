@@ -3,15 +3,21 @@
 namespace App\Http\Controllers\Private\Mahasiswa;
 
 use App\Http\Controllers\Controller;
-use App\Models\WebSetting;
+use App\Models\Pengaturan\WebSetting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LayananController extends Controller
 {
+    private function mahasiswa()
+    {
+        return Auth::guard('mahasiswa')->user();
+    }
+
     public function page(Request $request, $title = 'Layanan')
     {
-        $u = auth()->user();
+        $u = $this->mahasiswa();
 
         return view('private.mahasiswa.menu-page', [
             'w' => WebSetting::first(),
@@ -24,7 +30,7 @@ class LayananController extends Controller
 
     public function cutiAkademik()
     {
-        $u = auth()->user();
+        $u = $this->mahasiswa();
         return view('private.mahasiswa.layanan.cuti-akademik', [
             'w' => WebSetting::first(),
             'user' => $u,
@@ -34,7 +40,7 @@ class LayananController extends Controller
 
     public function suratAktifKuliah()
     {
-        $u = auth()->user();
+        $u = $this->mahasiswa();
         $jabatanDosen = collect([
             (object)['id' => 'ketua', 'name' => 'Ketua STIT Darul Ilmi Tasikmalaya'],
             (object)['id' => 'wakil-ketua', 'name' => 'Wakil Ketua STIT Darul Ilmi Tasikmalaya'],
@@ -50,7 +56,7 @@ class LayananController extends Controller
 
     public function ajukanSuratAktifKuliah(Request $request)
     {
-        $user = auth()->user();
+        $user = $this->mahasiswa();
 
         $data = $request->validate([
             'nomor_surat' => 'nullable|string|max:100',
@@ -65,6 +71,10 @@ class LayananController extends Controller
             'tahun_akademik' => 'nullable|string|max:50',
             'keperluan' => 'required|string|max:200',
         ]);
+
+        if (!$user) {
+            abort(403, 'Sesi mahasiswa tidak ditemukan. Silakan login kembali sebagai mahasiswa.');
+        }
 
         $penandaTangan = [
             'Ketua STIT Darul Ilmi Tasikmalaya' => [
