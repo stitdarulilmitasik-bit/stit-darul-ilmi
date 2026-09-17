@@ -80,7 +80,7 @@ class RootController extends Controller
                 'edu2_graduate_year' => 'nullable|string|max:4',
                 'edu3_type' => 'nullable|in:SMA/SMK,Diploma,Sarjana,Magister,Doktor',
                 'edu3_place' => 'nullable|string|max:255',
-                'edu3_major' => 'nullable|in:SMA/SMK,Diploma,Sarjana,Magister,Doktor',
+                'edu3_major' => 'nullable|string|max:255',
                 'edu3_average_score' => 'nullable|string|max:10',
                 'edu3_graduate_year' => 'nullable|string|max:4',
                 'numb_kk' => 'nullable|string|max:20',
@@ -221,14 +221,8 @@ class RootController extends Controller
 
         $logo = null;
         $logoCandidates = [
-            public_path('logo.png'),
-            public_path('jpg-logo.jpg'),
-            public_path('storage/images/logo.png'),
-            public_path('storage/images/logo.jpg'),
-            public_path('storage/images/logo.jpeg'),
-            public_path('images/logo.png'),
-            public_path('images/logo.jpg'),
-            public_path('images/logo.jpeg'),
+            storage_path('app/public/images/logo/logo-vert.png'),
+            public_path('storage/images/logo/logo-vert.png'),
         ];
         foreach ($logoCandidates as $candidate) {
             if (is_file($candidate)) {
