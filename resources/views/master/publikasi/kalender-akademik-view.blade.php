@@ -1,0 +1,2 @@
+@extends('core-themes.core-backpage')
+@section('content')<div class="container-xl"><div class="card"><div class="card-header"><h3 class="card-title">Detail Kalender Akademik</h3></div><div class="card-body"><h2>{{ $kalender->name ?? '-' }}</h2><p><strong>Jenis:</strong> {{ $kalender->type ?? '-' }}</p><p><strong>Mulai:</strong> {{ $kalender->start_date ?? '-' }} &nbsp; <strong>Selesai:</strong> {{ $kalender->ended_date ?? '-' }}</p><div>{!! $kalender->desc ?? $kalender->note ?? '' !!}</div></div></div></div>@endsection

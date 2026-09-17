@@ -1,0 +1,16 @@
+{
+    "name": "SIAKAD STIT Darul Ilmi",
+    "short_name": "STIT Darul Ilmi",
+    "background_color": "#0b6b4f",
+    "display": "fullscreen",
+    "description": "Sistem Informasi Akademik STIT Darul Ilmi",
+    "theme_color": "#0b6b4f",
+    "start_url": "/",
+    "icons": [
+        {
+            "src": "logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

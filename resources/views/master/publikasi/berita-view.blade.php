@@ -1,0 +1,2 @@
+@extends('core-themes.core-backpage')
+@section('content')<div class="container-xl"><div class="card"><div class="card-header"><h3 class="card-title">Detail Berita</h3></div><div class="card-body"><h2>{{ $berita->name ?? '-' }}</h2><p class="text-muted">{{ $berita->created_at?->format('d/m/Y H:i') }}</p><div>{!! $berita->content ?? '' !!}</div></div></div></div>@endsection

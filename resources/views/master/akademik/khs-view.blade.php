@@ -1,0 +1,8 @@
+@extends('core-themes.core-backpage')
+@section('content')
+<div class="container-xl"><div class="card"><div class="card-header d-flex justify-content-between"><h3 class="card-title">Detail KHS</h3><a class="btn btn-primary" href="{{ route($spref.'akademik.khs-print',$khs->code) }}">Cetak PDF</a></div><div class="card-body">
+<div class="row mb-3"><div class="col-md-6"><strong>Mahasiswa:</strong> {{ $khs->mahasiswa->name ?? '-' }}<br><strong>NIM:</strong> {{ $khs->mahasiswa->numb_nim ?? $khs->mahasiswa->nim ?? '-' }}</div><div class="col-md-6"><strong>Semester:</strong> {{ $khs->semester }}<br><strong>Tahun Akademik:</strong> {{ $khs->tahunAkademik->name ?? '-' }}</div></div>
+<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>No</th><th>Kode</th><th>Mata Kuliah</th><th>SKS</th><th>Angka</th><th>Huruf</th><th>Mutu</th></tr></thead><tbody>@forelse($khs->nilaiSemester as $i=>$n)<tr><td>{{ $i+1 }}</td><td>{{ $n->mataKuliah->code ?? '-' }}</td><td>{{ $n->mataKuliah->name ?? '-' }}</td><td>{{ $n->sks }}</td><td>{{ $n->nilai_angka ?? '-' }}</td><td>{{ $n->nilai_huruf ?? '-' }}</td><td>{{ number_format($n->nilai_mutu ?? 0,2) }}</td></tr>@empty<tr><td colspan="7" class="text-center">Belum ada nilai terbit.</td></tr>@endforelse</tbody></table></div>
+<div class="row mt-3"><div class="col">IPS <strong>{{ number_format($khs->ips,2) }}</strong></div><div class="col">IPK <strong>{{ number_format($khs->ipk,2) }}</strong></div><div class="col">SKS Lulus <strong>{{ $khs->total_sks_lulus }}</strong></div><div class="col">Status <strong>{{ $khs->status_generate }}</strong></div></div>
+</div></div></div>
+@endsection

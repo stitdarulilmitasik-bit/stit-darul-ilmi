@@ -1,0 +1,4 @@
+@extends('core-themes.core-backpage')
+@section('content')
+<div class="container-xl"><div class="card"><div class="card-header d-flex justify-content-between"><h3 class="card-title">Detail Nilai</h3><a class="btn btn-secondary" href="{{ route($spref.'akademik.nilai-render') }}">Kembali</a></div><div class="card-body"><div class="row"><div class="col-md-6"><p><strong>Mahasiswa:</strong> {{ $nilai->mahasiswa->name ?? '-' }}</p><p><strong>NIM:</strong> {{ $nilai->mahasiswa->numb_nim ?? $nilai->mahasiswa->nim ?? '-' }}</p><p><strong>Mata Kuliah:</strong> {{ $nilai->mataKuliah->name ?? '-' }}</p></div><div class="col-md-6"><p><strong>Kode:</strong> {{ $nilai->mataKuliah->code ?? '-' }}</p><p><strong>Semester:</strong> {{ $nilai->semester }}</p><p><strong>Nilai:</strong> {{ $nilai->nilai_angka ?? '-' }} / {{ $nilai->nilai_huruf ?? '-' }} / {{ number_format($nilai->nilai_mutu ?? 0,2) }}</p></div></div></div></div></div>
+@endsection

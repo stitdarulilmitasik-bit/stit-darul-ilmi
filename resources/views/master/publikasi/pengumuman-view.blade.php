@@ -1,0 +1,2 @@
+@extends('core-themes.core-backpage')
+@section('content')<div class="container-xl"><div class="card"><div class="card-header"><h3 class="card-title">Detail Pengumuman</h3></div><div class="card-body"><h2>{{ $pengumuman->name ?? $pengumuman->title ?? '-' }}</h2><p class="text-muted">{{ $pengumuman->created_at?->format('d/m/Y H:i') }}</p><div>{!! $pengumuman->content ?? $pengumuman->desc ?? '' !!}</div></div></div></div>@endsection
