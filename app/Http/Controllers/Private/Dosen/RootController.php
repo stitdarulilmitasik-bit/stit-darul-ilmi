@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Private\Dosen;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-// USE SYSTEM
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-// USE MODELS
 use App\Models\Pengaturan\WebSetting;
+use App\Models\Akademik\JadwalKuliah;
+use App\Models\Akademik\MataKuliah;
+use App\Models\Akademik\KRS;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 
@@ -31,9 +32,7 @@ class RootController extends Controller
     public function handleProfile(Request $request)
     {
         try {
-            // Validate the request
             $validator = Validator::make($request->all(), [
-                // Personal Information
                 'name' => 'required|string|max:255',
                 'title_front' => 'nullable|string|max:50',
                 'title_behind' => 'nullable|string|max:50',
@@ -46,15 +45,11 @@ class RootController extends Controller
                 'bio_blood' => 'nullable|string|max:5',
                 'bio_height' => 'nullable|numeric',
                 'bio_weight' => 'nullable|numeric',
-
-                // Contact Information
                 'email' => 'required|email|unique:dosens,email,' . Auth::guard('dosen')->user()->id,
                 'phone' => 'required|string|unique:dosens,phone,' . Auth::guard('dosen')->user()->id,
                 'link_ig' => 'nullable|url',
                 'link_fb' => 'nullable|url',
                 'link_in' => 'nullable|url',
-
-                // Address Information
                 'ktp_addres' => 'nullable|string',
                 'ktp_rt' => 'nullable|string|max:10',
                 'ktp_rw' => 'nullable|string|max:10',
@@ -72,8 +67,6 @@ class RootController extends Controller
                 'domicile_city' => 'nullable|required_if:domicile_same,No|string|max:100',
                 'domicile_province' => 'nullable|required_if:domicile_same,No|string|max:100',
                 'domicile_poscode' => 'nullable|required_if:domicile_same,No|string|max:10',
-
-                // Education Information
                 'edu1_type' => 'required|in:SMA/SMK,Diploma,Sarjana,Magister,Doktor',
                 'edu1_place' => 'required|string|max:255',
                 'edu1_major' => 'required|string|max:255',
@@ -89,8 +82,6 @@ class RootController extends Controller
                 'edu3_major' => 'nullable|string|max:255',
                 'edu3_average_score' => 'nullable|string|max:10',
                 'edu3_graduate_year' => 'nullable|string|max:4',
-
-                // Identity Information
                 'numb_kk' => 'nullable|string|max:20',
                 'numb_ktp' => 'nullable|string|max:20',
                 'numb_npsn' => 'nullable|string|max:20',
@@ -100,56 +91,99 @@ class RootController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return redirect()->back()
-                    ->withErrors($validator)
-                    ->withInput();
+                return redirect()->back()->withErrors($validator)->withInput();
             }
 
             $user = Auth::guard('dosen')->user();
             $data = $validator->validated();
 
-            // Handle photo upload
             if ($request->hasFile('photo')) {
-                // Delete old photo if exists
                 if ($user->photo && $user->photo !== 'default.jpg') {
                     Storage::disk('public')->delete('images/profile/' . $user->photo);
                 }
 
-                // Kompres dan simpan foto profil
                 $photoName = time() . '-' . $user->code . '-' . uniqid() . '-' . uniqid() . '.jpg';
-                
-                // Buat instance ImageManager dengan driver GD
                 $manager = new ImageManager(new Driver());
-                
-                // Baca dan kompres gambar
                 $image = $manager->read($request->photo->getRealPath());
-                
-                // Resize dengan ukuran yang lebih besar untuk foto profil
                 if ($image->height() > 1200) {
                     $image->scaleDown(height: 1200);
                 }
-                
-                // Simpan dengan kualitas tinggi (90%)
                 Storage::disk('public')->put('images/profile/' . $photoName, $image->toJpeg(90));
-                
                 $data['photo'] = $photoName;
             }
 
-            // Update dosen information
             $user->update($data);
-
             return redirect()->back()->with('success', 'Profile updated successfully');
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Failed to update profile: ' . $e->getMessage())
-                ->withInput();
+            return redirect()->back()->with('error', 'Failed to update profile: ' . $e->getMessage())->withInput();
         }
     }
+
     public function renderDashboard()
     {
-        $user=Auth::guard('dosen')->user(); abort_unless($user,403);
-        $w=WebSetting::first();
-        return view('private.dosen.dashboard',['user'=>$user,'webs'=>$w,'menus'=>'Dashboard','pages'=>'Dashboard Dosen','academy'=>$w?$w->school_apps.' by '.$w->school_name:'SIAKAD']);
-    }
+        $user = Auth::guard('dosen')->user();
+        abort_unless($user, 403);
 
+        $webs = WebSetting::first();
+        $mataKuliah = MataKuliah::where(function ($q) use ($user) {
+            $q->where('dosen1_id', $user->id)
+              ->orWhere('dosen2_id', $user->id)
+              ->orWhere('dosen3_id', $user->id);
+        })->with('programStudi')->get();
+
+        $jadwal = JadwalKuliah::with(['mataKuliah.programStudi', 'ruang', 'jenisKelas', 'waktuKuliah', 'kelas'])
+            ->where('dosen_id', $user->id)
+            ->latest()
+            ->get();
+
+        $distribution = $mataKuliah->groupBy(function ($item) {
+            return $item->programStudi->name ?? $item->programStudi->nama ?? 'Belum Ditentukan';
+        })->map->count()->sortDesc();
+
+        $krsPending = 0;
+        try {
+            $krsPending = KRS::where('status', 'Diajukan')
+                ->whereHas('details', function ($q) use ($user) {
+                    $q->where('dosen_id', $user->id);
+                })->count();
+        } catch (\Throwable $e) {
+            $krsPending = 0;
+        }
+
+        $activities = collect();
+        foreach ($mataKuliah->sortByDesc('created_at')->take(5) as $item) {
+            $activities->push([
+                'title' => 'Mata Kuliah',
+                'description' => ($item->name ?? 'Mata kuliah') . ' berada dalam daftar ampuan Anda',
+                'time' => $item->created_at,
+                'icon' => 'fa-book',
+            ]);
+        }
+        foreach ($jadwal->sortByDesc('created_at')->take(5) as $item) {
+            $activities->push([
+                'title' => 'Jadwal Kuliah',
+                'description' => 'Jadwal ' . ($item->mataKuliah->name ?? 'perkuliahan') . ' ditambahkan',
+                'time' => $item->created_at,
+                'icon' => 'fa-calendar-alt',
+            ]);
+        }
+        $activities = $activities->sortByDesc('time')->take(10);
+
+        return view('private.dosen.dashboard', [
+            'user' => $user,
+            'webs' => $webs,
+            'spref' => 'dosen.',
+            'menus' => 'Dashboard',
+            'pages' => 'Dashboard Dosen',
+            'academy' => $webs ? $webs->school_apps . ' by ' . $webs->school_name : 'SIAKAD',
+            'totalStudents' => $jadwal->flatMap(fn ($j) => $j->kelas)->flatMap(fn ($k) => $k->mahasiswas ?? collect())->unique('id')->count(),
+            'activeCourses' => $mataKuliah->count(),
+            'totalFaculty' => 1,
+            'totalEvents' => $jadwal->count(),
+            'krsPending' => $krsPending,
+            'distribution' => $distribution,
+            'activities' => $activities,
+            'jadwalSaya' => $jadwal,
+        ]);
+    }
 }
