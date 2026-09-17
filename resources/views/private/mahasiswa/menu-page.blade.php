@@ -2,9 +2,36 @@
 @section('content')
 <div class="container-fluid">
     <div class="card">
-        <div class="card-header"><h2 class="card-title">{{ $title }}</h2></div>
+        <div class="card-header">
+            <h2 class="card-title">{{ $title }}</h2>
+        </div>
         <div class="card-body">
             <p class="text-muted">{{ $message }}</p>
+
+            @if($title === 'Surat Keterangan')
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6 col-lg-4">
+                        <a href="{{ route('mahasiswa.layanan.surat-aktif-kuliah') }}" class="card card-link card-link-pop h-100 text-decoration-none">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="avatar avatar-lg bg-primary-lt me-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h6l6 6v10a2 2 0 0 1 -2 2h-6"/><path d="M9 17h6"/><path d="M9 13h6"/></svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="card-title mb-1">Surat Keterangan Aktif Kuliah</h3>
+                                        <div class="text-secondary">Cetak surat keterangan resmi</div>
+                                    </div>
+                                </div>
+                                <p class="text-secondary mb-0">Surat keterangan bahwa mahasiswa masih aktif mengikuti perkuliahan di STIT Darul Ilmi Tasikmalaya.</p>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <span class="btn btn-primary">Buat Surat Aktif Kuliah</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             @isset($items)
                 @if($items->count())
                     <div class="list-group list-group-flush">
@@ -17,6 +44,7 @@
                     </div>
                 @endif
             @endisset
+
             @if($title === 'Bantuan')
                 <form method="POST" action="{{ route('mahasiswa.bantuan.kirim-pesan') }}" class="mt-4">
                     @csrf
