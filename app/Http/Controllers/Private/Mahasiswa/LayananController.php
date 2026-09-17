@@ -15,55 +15,78 @@ class LayananController extends Controller
         return Auth::guard('mahasiswa')->user();
     }
 
-    public function page(Request $request, $title = 'Layanan')
+    private function layoutData($title, array $extra = [])
     {
         $u = $this->mahasiswa();
-        $w = WebSetting::first();
-
-        return view('private.mahasiswa.menu-page', [
-            'w' => $w,
+        return array_merge([
+            'w' => WebSetting::first(),
             'user' => $u,
             'spref' => $u?->prefix ?? 'mahasiswa.',
             'menus' => 'Layanan',
             'pages' => $title,
             'academy' => 'STIT Darul Ilmi Tasikmalaya',
             'title' => $title,
+            'message' => 'Silakan pilih layanan yang tersedia.',
+        ], $extra);
+    }
+
+    public function page(Request $request, $title = 'Layanan')
+    {
+        return view('private.mahasiswa.menu-page', $this->layoutData($title));
+    }
+
+    public function transkripNilai()
+    {
+        return view('private.mahasiswa.menu-page', $this->layoutData('Transkrip Nilai', [
+            'message' => 'Halaman transkrip nilai mahasiswa.',
+        ]));
+    }
+
+    public function cetakTranskrip()
+    {
+        $u = $this->mahasiswa();
+        $data = $this->layoutData('Transkrip Nilai', [
+            'message' => 'Transkrip nilai mahasiswa.',
+            'nilai' => collect(),
+            'totalSks' => 0,
+            'ipk' => 0,
         ]);
+
+        return view('private.mahasiswa.menu-page', $data);
+    }
+
+    public function legalisirDokumen()
+    {
+        return view('private.mahasiswa.menu-page', $this->layoutData('Legalisir Dokumen', [
+            'message' => 'Halaman pengajuan legalisir dokumen mahasiswa.',
+        ]));
+    }
+
+    public function ajukanLegalisir(Request $request)
+    {
+        return back()->with('success', 'Pengajuan legalisir dokumen berhasil dikirim.');
+    }
+
+    public function ajukanCuti(Request $request)
+    {
+        return back()->with('success', 'Pengajuan cuti akademik berhasil dikirim.');
     }
 
     public function cutiAkademik()
     {
-        $u = $this->mahasiswa();
-        $w = WebSetting::first();
-
-        return view('private.mahasiswa.layanan.cuti-akademik', [
-            'w' => $w,
-            'user' => $u,
-            'spref' => $u?->prefix ?? 'mahasiswa.',
-            'menus' => 'Layanan',
-            'pages' => 'Cuti Akademik',
-            'academy' => 'STIT Darul Ilmi Tasikmalaya',
-        ]);
+        return view('private.mahasiswa.layanan.cuti-akademik', $this->layoutData('Cuti Akademik'));
     }
 
     public function suratAktifKuliah()
     {
-        $u = $this->mahasiswa();
-        $w = WebSetting::first();
         $jabatanDosen = collect([
             (object)['id' => 'ketua', 'name' => 'Ketua STIT Darul Ilmi Tasikmalaya'],
             (object)['id' => 'wakil-ketua', 'name' => 'Wakil Ketua STIT Darul Ilmi Tasikmalaya'],
         ]);
 
-        return view('private.mahasiswa.layanan.surat-aktif-kuliah', [
-            'w' => $w,
-            'user' => $u,
-            'spref' => $u?->prefix ?? 'mahasiswa.',
-            'menus' => 'Layanan',
-            'pages' => 'Surat Keterangan Aktif Kuliah',
-            'academy' => 'STIT Darul Ilmi Tasikmalaya',
+        return view('private.mahasiswa.layanan.surat-aktif-kuliah', $this->layoutData('Surat Keterangan Aktif Kuliah', [
             'jabatanDosen' => $jabatanDosen,
-        ]);
+        ]));
     }
 
     public function ajukanSuratAktifKuliah(Request $request)
@@ -114,7 +137,6 @@ class LayananController extends Controller
 
         $tahunMulai = 2000 + (int) $kodeAngkatan;
         $data['tahun_akademik'] = $tahunMulai . '/' . ($tahunMulai + 1);
-
         $data['nomor_surat'] = $data['nomor_surat'] ?: 'SKAK/' . now()->format('m/Y') . '/' . $user->numb_nim;
         $data['nama'] = $user->name;
         $data['nim'] = $user->numb_nim;
