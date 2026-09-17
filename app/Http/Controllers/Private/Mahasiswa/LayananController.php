@@ -18,8 +18,11 @@ class LayananController extends Controller
     private function layoutData($title, array $extra = [])
     {
         $u = $this->mahasiswa();
+        $webs = WebSetting::first();
+
         return array_merge([
-            'w' => WebSetting::first(),
+            'w' => $webs,
+            'webs' => $webs,
             'user' => $u,
             'spref' => $u?->prefix ?? 'mahasiswa.',
             'menus' => 'Layanan',
@@ -44,15 +47,12 @@ class LayananController extends Controller
 
     public function cetakTranskrip()
     {
-        $u = $this->mahasiswa();
-        $data = $this->layoutData('Transkrip Nilai', [
+        return view('private.mahasiswa.menu-page', $this->layoutData('Transkrip Nilai', [
             'message' => 'Transkrip nilai mahasiswa.',
             'nilai' => collect(),
             'totalSks' => 0,
             'ipk' => 0,
-        ]);
-
-        return view('private.mahasiswa.menu-page', $data);
+        ]));
     }
 
     public function legalisirDokumen()
