@@ -16,7 +16,6 @@ class DashboardController extends Controller
     {
         $user = Auth::guard('mahasiswa')->user();
         abort_unless($user, 403);
-
         $webs = WebSetting::first();
         $data = [
             'webs' => $webs,
@@ -26,92 +25,48 @@ class DashboardController extends Controller
             'academy' => ($webs->school_apps ?? 'SIAKAD') . ' by ' . ($webs->school_name ?? 'STIT Darul Ilmi Tasikmalaya'),
             'user' => $user,
         ];
-
         $this->academic($data, $user);
         $this->schedule($data, $user);
         $this->attendance($data, $user);
         $this->finance($data, $user);
         $this->announcements($data);
         $this->activities($data, $user);
-
         return view('private.mahasiswa.dashboard', $data);
     }
 
     private function academic(&$data, $user)
     {
-        $krs = KRS::where('mahasiswa_id', $user->id)
-            ->with(['details.mataKuliah', 'details.nilai', 'tahunAkademik'])
-            ->get();
-
-        $totalSks = 0;
-        $totalSksLulus = 0;
-        $totalMutu = 0;
-        $semesterResults = [];
-        $semesterOrder = [];
-
+        $krs = KRS::where('mahasiswa_id', $user->id)->with(['details.mataKuliah', 'details.nilai', 'tahunAkademik'])->get();
+        $totalSks = 0; $totalSksLulus = 0; $totalMutu = 0; $semesterResults = [];
         foreach ($krs as $item) {
-            $semesterSks = 0;
-            $semesterMutu = 0;
-            $semesterKey = (string) ($item->semester ?? '0');
-            $semesterOrder[$semesterKey] = $item->created_at?->timestamp ?? 0;
-
+            $semesterSks = 0; $semesterMutu = 0; $semesterKey = (string) ($item->semester ?? '0');
             foreach ($item->details as $detail) {
-                $mk = $detail->mataKuliah;
-                $nilai = $detail->nilai;
+                $mk = $detail->mataKuliah; $nilai = $detail->nilai;
                 $sks = (float) ($mk->bsks ?? $mk->sks ?? 0);
-                if (!$nilai || $sks <= 0) {
-                    continue;
-                }
-
+                if (!$nilai || $sks <= 0) continue;
                 $bobot = $this->nilaiMutu($nilai);
-                $semesterSks += $sks;
-                $semesterMutu += $bobot * $sks;
-                $totalSks += $sks;
-                $totalMutu += $bobot * $sks;
-
-                if ($bobot >= 2.00) {
-                    $totalSksLulus += $sks;
-                }
+                $semesterSks += $sks; $semesterMutu += $bobot * $sks; $totalSks += $sks; $totalMutu += $bobot * $sks;
+                if ($bobot >= 2.00) $totalSksLulus += $sks;
             }
-
-            if ($semesterSks > 0) {
-                $semesterResults[$semesterKey] = round($semesterMutu / $semesterSks, 2);
-            }
+            if ($semesterSks > 0) $semesterResults[$semesterKey] = round($semesterMutu / $semesterSks, 2);
         }
-
-        uksort($semesterResults, function ($a, $b) use ($semesterOrder) {
-            return ($semesterOrder[$a] ?? 0) <=> ($semesterOrder[$b] ?? 0);
-        });
-
         $data['ips'] = $semesterResults ? end($semesterResults) : 0;
         $data['ipk'] = $totalSks > 0 ? round($totalMutu / $totalSks, 2) : 0;
         $data['total_sks'] = $totalSks;
         $data['total_sks_lulus'] = $totalSksLulus;
         $data['sks_kebutuhan'] = (int) ($user->programStudi->sks_lulus ?? 144);
-        $data['progress_sks'] = $data['sks_kebutuhan'] > 0
-            ? min(100, round(($totalSksLulus / $data['sks_kebutuhan']) * 100, 1))
-            : 0;
+        $data['progress_sks'] = $data['sks_kebutuhan'] > 0 ? min(100, round(($totalSksLulus / $data['sks_kebutuhan']) * 100, 1)) : 0;
         $data['jumlah_krs'] = $krs->count();
     }
 
     private function nilaiMutu($nilai)
     {
-        if ($nilai->nilai_mutu !== null) {
-            return (float) $nilai->nilai_mutu;
-        }
+        if ($nilai->nilai_mutu !== null) return (float) $nilai->nilai_mutu;
         $angka = (float) ($nilai->nilai_angka ?? 0);
         return match (true) {
-            $angka >= 85 => 4.00,
-            $angka >= 80 => 3.67,
-            $angka >= 75 => 3.33,
-            $angka >= 70 => 3.00,
-            $angka >= 65 => 2.67,
-            $angka >= 60 => 2.33,
-            $angka >= 55 => 2.00,
-            $angka >= 50 => 1.67,
-            $angka >= 45 => 1.33,
-            $angka >= 40 => 1.00,
-            default => 0.00,
+            $angka >= 85 => 4.00, $angka >= 80 => 3.67, $angka >= 75 => 3.33, $angka >= 70 => 3.00,
+            $angka >= 65 => 2.67, $angka >= 60 => 2.33, $angka >= 55 => 2.00, $angka >= 50 => 1.67,
+            $angka >= 45 => 1.33, $angka >= 40 => 1.00, default => 0.00,
         };
     }
 
@@ -119,21 +74,9 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
         $day = $today->locale('id')->translatedFormat('l');
-
         $query = JadwalKuliah::with(['mataKuliah', 'dosen', 'ruang', 'waktuKuliah', 'kelas'])
-            ->where(function ($q) use ($user) {
-                $q->whereHas('kelas.mahasiswas', fn ($m) => $m->where('id', $user->id))
-                  ->orWhereHas('mataKuliah', function ($m) use ($user) {
-                      $m->whereHas('krsDetails.krs', fn ($k) => $k->where('mahasiswa_id', $user->id));
-                  });
-            });
-
-        $todayRows = (clone $query)->where(function ($q) use ($day) {
-            $q->where('hari', $day)->orWhere('hari', ucfirst(strtolower($day)));
-        })->get();
-
-        $todayRows = $todayRows->sortBy(fn ($item) => $item->waktuKuliah?->time_start ?? '99:99');
-
+            ->whereHas('kelas.mahasiswas', fn ($q) => $q->where('id', $user->id));
+        $todayRows = (clone $query)->where('hari', $day)->get()->sortBy(fn ($item) => $item->waktuKuliah?->time_start ?? '99:99');
         $data['tanggal_hari_ini'] = $today->locale('id')->translatedFormat('l, d F Y');
         $data['jadwal_hari_ini'] = $todayRows->map(fn ($item) => $this->scheduleRow($item))->values()->all();
         $data['jadwal_minggu_ini'] = (clone $query)->orderBy('tanggal')->get()->map(fn ($item) => $this->scheduleRow($item))->values()->all();
@@ -141,101 +84,53 @@ class DashboardController extends Controller
 
     private function scheduleRow($item)
     {
-        $start = $item->waktuKuliah?->time_start;
-        $end = $item->waktuKuliah?->time_ended;
-        $now = now();
-        $status = 'selesai';
+        $start = $item->waktuKuliah?->time_start; $end = $item->waktuKuliah?->time_ended; $now = now(); $status = 'selesai';
         if ($start && $end) {
-            $s = Carbon::today()->setTimeFromTimeString($start);
-            $e = Carbon::today()->setTimeFromTimeString($end);
+            $s = Carbon::today()->setTimeFromTimeString($start); $e = Carbon::today()->setTimeFromTimeString($end);
             $status = $now->between($s, $e) ? 'berlangsung' : ($now->lt($s) ? 'akan_datang' : 'selesai');
         }
-
-        $dosen = $item->dosen;
-        $namaDosen = $dosen?->name ?? $dosen?->nama ?? '-';
-        $ruang = $item->ruang?->name ?? $item->ruang?->nama_ruang ?? '-';
-        $metode = $item->metode ?? $item->metode_pembelajaran ?? '-';
-
+        $dosen = $item->dosen; $namaDosen = $dosen?->name ?? $dosen?->nama ?? '-';
         return [
             'id' => $item->id,
             'mata_kuliah' => $item->mataKuliah?->name ?? $item->mataKuliah?->nama_mk ?? '-',
-            'kode' => $item->mataKuliah?->code ?? '-',
-            'bsks' => $item->mataKuliah?->bsks ?? 0,
-            'dosen' => trim($namaDosen),
-            'ruang' => $ruang,
-            'hari' => $item->hari ?? '-',
-            'tanggal' => $item->tanggal ? Carbon::parse($item->tanggal)->locale('id')->translatedFormat('d F Y') : '-',
-            'time_start' => $start ? Carbon::parse($start)->format('H:i') : '-',
-            'time_ended' => $end ? Carbon::parse($end)->format('H:i') : '-',
-            'metode' => $metode,
-            'status' => $status,
+            'kode' => $item->mataKuliah?->code ?? '-', 'bsks' => $item->mataKuliah?->bsks ?? 0,
+            'dosen' => trim($namaDosen), 'ruang' => $item->ruang?->name ?? $item->ruang?->nama_ruang ?? '-',
+            'hari' => $item->hari ?? '-', 'tanggal' => $item->tanggal ? Carbon::parse($item->tanggal)->locale('id')->translatedFormat('d F Y') : '-',
+            'time_start' => $start ? Carbon::parse($start)->format('H:i') : '-', 'time_ended' => $end ? Carbon::parse($end)->format('H:i') : '-',
+            'metode' => $item->metode ?? $item->metode_pembelajaran ?? '-', 'status' => $status,
         ];
     }
 
     private function attendance(&$data, $user)
     {
-        $data['kehadiran_bulan_ini'] = null;
-        $data['total_pertemuan'] = null;
-        $data['hadir'] = null;
-        $data['kehadiran_tersedia'] = false;
-
+        $data['kehadiran_bulan_ini'] = null; $data['total_pertemuan'] = null; $data['hadir'] = null; $data['kehadiran_tersedia'] = false;
         try {
-            $model = class_exists('App\\Models\\Akademik\\Presensi') ? 'App\\Models\\Akademik\\Presensi' : null;
-            if (!$model) return;
-            $rows = $model::where('mahasiswa_id', $user->id)->get();
+            if (!class_exists('App\\Models\\Akademik\\Presensi')) return;
+            $rows = \App\Models\Akademik\Presensi::where('mahasiswa_id', $user->id)->get();
             if ($rows->isEmpty()) return;
-            $total = $rows->count();
-            $hadir = $rows->filter(fn ($r) => strtolower((string) ($r->status ?? $r->keterangan ?? '')) === 'hadir')->count();
-            $data['total_pertemuan'] = $total;
-            $data['hadir'] = $hadir;
-            $data['kehadiran_bulan_ini'] = $total ? round(($hadir / $total) * 100) : 0;
-            $data['kehadiran_tersedia'] = true;
-        } catch (\Throwable $e) {
-            // Dashboard must remain available when attendance schema differs.
-        }
+            $total = $rows->count(); $hadir = $rows->filter(fn ($r) => strtolower((string) ($r->status ?? $r->keterangan ?? '')) === 'hadir')->count();
+            $data['total_pertemuan'] = $total; $data['hadir'] = $hadir; $data['kehadiran_bulan_ini'] = round(($hadir / $total) * 100); $data['kehadiran_tersedia'] = true;
+        } catch (\Throwable $e) {}
     }
 
     private function finance(&$data, $user)
     {
-        $data['tagihan_aktif'] = [];
-        $data['total_tagihan'] = 0;
-        $data['riwayat_pembayaran'] = [];
-
+        $data['tagihan_aktif'] = []; $data['total_tagihan'] = 0; $data['riwayat_pembayaran'] = [];
         try {
-            $tagihan = \App\Models\Keuangan\TagihanKuliah::where('mahasiswa_id', $user->id)
-                ->where('status', 'Pending')->orderBy('due_date')->get();
-            $data['tagihan_aktif'] = $tagihan->map(fn ($item) => [
-                'desc' => $item->desc ?? 'Tagihan kuliah',
-                'amount' => (float) ($item->amount ?? 0),
-                'due_date' => $item->due_date,
-                'status' => $item->status,
-            ])->all();
+            $tagihan = \App\Models\Keuangan\TagihanKuliah::where('mahasiswa_id', $user->id)->where('status', 'Pending')->orderBy('due_date')->get();
+            $data['tagihan_aktif'] = $tagihan->map(fn ($item) => ['desc' => $item->desc ?? 'Tagihan kuliah', 'amount' => (float) ($item->amount ?? 0), 'due_date' => $item->due_date, 'status' => $item->status])->all();
             $data['total_tagihan'] = array_sum(array_column($data['tagihan_aktif'], 'amount'));
-        } catch (\Throwable $e) {
-            // Keep financial cards empty instead of breaking the dashboard.
-        }
-
+        } catch (\Throwable $e) {}
         try {
-            $payments = \App\Models\Keuangan\RiwayatPembayaran::where('mahasiswa_id', $user->id)
-                ->where('status_pembayaran', 'Sukses')->orderByDesc('tgl_pembayaran')->limit(5)->get();
-            $data['riwayat_pembayaran'] = $payments->map(fn ($item) => [
-                'amount' => (float) ($item->jumlah_bayar ?? 0),
-                'updated_at' => $item->tgl_pembayaran,
-                'status' => $item->status_pembayaran,
-            ])->all();
-        } catch (\Throwable $e) {
-            // Keep payment history empty instead of breaking the dashboard.
-        }
+            $payments = \App\Models\Keuangan\RiwayatPembayaran::where('mahasiswa_id', $user->id)->where('status_pembayaran', 'Sukses')->orderByDesc('tgl_pembayaran')->limit(5)->get();
+            $data['riwayat_pembayaran'] = $payments->map(fn ($item) => ['amount' => (float) ($item->jumlah_bayar ?? 0), 'updated_at' => $item->tgl_pembayaran, 'status' => $item->status_pembayaran])->all();
+        } catch (\Throwable $e) {}
     }
 
     private function announcements(&$data)
     {
-        try {
-            $data['pengumuman'] = \App\Models\Publikasi\Pengumuman::where('status', 'Publish')
-                ->where('created_at', '<=', now())->latest()->limit(5)->get(['name', 'content', 'created_at'])->all();
-        } catch (\Throwable $e) {
-            $data['pengumuman'] = [];
-        }
+        try { $data['pengumuman'] = \App\Models\Publikasi\Pengumuman::where('status', 'Publish')->where('created_at', '<=', now())->latest()->limit(5)->get(['name', 'content', 'created_at'])->all(); }
+        catch (\Throwable $e) { $data['pengumuman'] = []; }
     }
 
     private function activities(&$data, $user)
@@ -243,14 +138,9 @@ class DashboardController extends Controller
         $activities = [];
         $krs = KRS::where('mahasiswa_id', $user->id)->latest()->first();
         if ($krs) $activities[] = ['title' => 'KRS terakhir diperbarui', 'description' => 'Data KRS mahasiswa telah tersimpan.', 'time' => $krs->updated_at, 'badge' => 'KRS', 'badge_color' => 'primary'];
-
         $nilai = Nilai::where('mahasiswa_id', $user->id)->latest('updated_at')->first();
         if ($nilai) $activities[] = ['title' => 'Nilai terbaru tersedia', 'description' => 'Ada data nilai yang baru diperbarui.', 'time' => $nilai->updated_at, 'badge' => 'Nilai', 'badge_color' => 'info'];
-
-        foreach ($data['riwayat_pembayaran'] as $payment) {
-            $activities[] = ['title' => 'Pembayaran berhasil', 'description' => 'Pembayaran Rp ' . number_format($payment['amount'], 0, ',', '.') . ' tercatat.', 'time' => $payment['updated_at'], 'badge' => 'Keuangan', 'badge_color' => 'success'];
-        }
-
+        foreach ($data['riwayat_pembayaran'] as $payment) $activities[] = ['title' => 'Pembayaran berhasil', 'description' => 'Pembayaran Rp ' . number_format($payment['amount'], 0, ',', '.') . ' tercatat.', 'time' => $payment['updated_at'], 'badge' => 'Keuangan', 'badge_color' => 'success'];
         usort($activities, fn ($a, $b) => strtotime((string) $b['time']) <=> strtotime((string) $a['time']));
         $data['aktivitas_terbaru'] = array_slice($activities, 0, 5);
     }
