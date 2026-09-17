@@ -32,9 +32,9 @@ class CmsHomeController extends Controller
             'kalender' => KalenderAkademik::where('status', 'Publish')->orderBy('start_date')->take(6)->get(),
             'programStudis' => ProgramStudi::where('status', 'Aktif')->with('fakultas')->orderBy('name')->take(6)->get(),
             'fakultas' => Fakultas::withCount(['programStudis' => fn ($q) => $q->where('status', 'Aktif')])->take(3)->get(),
-            // core-mainpage expects these variables. Pass the current
-            // authenticated user explicitly; guests receive null.
+            // Variables required by the shared core-mainpage theme.
             'user' => auth()->user(),
+            'spref' => 'web-admin.',
             'pages' => 'Beranda',
             'academy' => 'STIT Darul Ilmi Tasikmalaya',
         ]);
