@@ -51,7 +51,7 @@ use Illuminate\Support\Facades\Route;
     Route::delete('/akademik/jadwal-kuliah/{code}',[App\Http\Controllers\Master\Akademik\JadwalKuliahController::class, 'deleteJadwalKuliah'])->name('akademik.jadwal-kuliah-delete');
     Route::get('akademik/get-waktu-kuliah/{jenis_kelas_id}', [App\Http\Controllers\Master\Akademik\JadwalKuliahController::class, 'getWaktuKuliahByJenisKelas'])->name('akademik.get-waktu-kuliah');
 
-    // MASTER AKADEMIK => KRS
+    // MASTER AKADEMIK => KRS (KARTU RENCANA STUDI)
     Route::get('/akademik/krs',[App\Http\Controllers\Master\Akademik\KRSController::class, 'renderKRS'])->name('akademik.krs-render');
     Route::post('/akademik/krs',[App\Http\Controllers\Master\Akademik\KRSController::class, 'handleKRS'])->name('akademik.krs-handle');
     Route::get('/akademik/krs/{code}/detail',[App\Http\Controllers\Master\Akademik\KRSController::class, 'detailKRS'])->name('akademik.krs-detail');
@@ -82,7 +82,7 @@ use Illuminate\Support\Facades\Route;
     Route::post('/akademik/nilai/{code}/publish',[App\Http\Controllers\Master\Akademik\NilaiController::class, 'publishNilai'])->name('akademik.nilai-publish');
     Route::post('/akademik/nilai/{code}/lock',[App\Http\Controllers\Master\Akademik\NilaiController::class, 'lockNilai'])->name('akademik.nilai-lock');
 
-    // MASTER AKADEMIK => KHS
+    // MASTER AKADEMIK => KHS (KARTU HASIL STUDI)
     Route::get('/akademik/khs',[App\Http\Controllers\Master\Akademik\KHSController::class, 'renderKHS'])->name('akademik.khs-render');
     Route::post('/akademik/khs',[App\Http\Controllers\Master\Akademik\KHSController::class, 'handleKHS'])->name('akademik.khs-handle');
     Route::get('/akademik/khs/{code}/detail',[App\Http\Controllers\Master\Akademik\KHSController::class, 'detailKHS'])->name('akademik.khs-detail');
@@ -109,12 +109,78 @@ use Illuminate\Support\Facades\Route;
     Route::patch('/akademik/waktu-kuliah/{code}',[App\Http\Controllers\Master\Akademik\WaktuKuliahController::class, 'updateWaktuKuliah'])->name('akademik.waktu-kuliah-update');
     Route::delete('/akademik/waktu-kuliah/{code}',[App\Http\Controllers\Master\Akademik\WaktuKuliahController::class, 'deleteWaktuKuliah'])->name('akademik.waktu-kuliah-delete');
 
-    // MASTER PUBLIKASI => KALENDER AKADEMIK
-    Route::get('/publikasi/kalender-akademik', [App\Http\Controllers\Master\Publikasi\KalenderAkademikController::class, 'renderKalenderAkademik'])->name('publikasi.kalender-akademik-render');
-    Route::get('/publikasi/kalender-akademik/{code}/view', [App\Http\Controllers\Master\Publikasi\KalenderAkademikController::class, 'viewKalenderAkademik'])->name('publikasi.kalender-akademik-view');
-    Route::post('/publikasi/kalender-akademik', [App\Http\Controllers\Master\Publikasi\KalenderAkademikController::class, 'handleKalenderAkademik'])->name('publikasi.kalender-akademik-handle');
-    Route::patch('/publikasi/kalender-akademik/{code}', [App\Http\Controllers\Master\Publikasi\KalenderAkademikController::class, 'updateKalenderAkademik'])->name('publikasi.kalender-akademik-update');
-    Route::delete('/publikasi/kalender-akademik/{code}', [App\Http\Controllers\Master\Publikasi\KalenderAkademikController::class, 'deleteKalenderAkademik'])->name('publikasi.kalender-akademik-delete');
+    // MASTER PMB => PERIODE PENDAFTARAN
+    Route::get('/pmb/periode',[App\Http\Controllers\Master\PMB\PeriodePendaftaranController::class, 'renderPeriode'])->name('pmb.periode-render');
+    Route::post('/pmb/periode',[App\Http\Controllers\Master\PMB\PeriodePendaftaranController::class, 'handlePeriode'])->name('pmb.periode-handle');
+    Route::patch('/pmb/periode/{code}',[App\Http\Controllers\Master\PMB\PeriodePendaftaranController::class, 'updatePeriode'])->name('pmb.periode-update');
+    Route::delete('/pmb/periode/{code}',[App\Http\Controllers\Master\PMB\PeriodePendaftaranController::class, 'deletePeriode'])->name('pmb.periode-delete');
+
+    // MASTER PMB => JALUR PENDAFTARAN
+    Route::get('/pmb/jalur',[App\Http\Controllers\Master\PMB\JalurPendaftaranController::class, 'renderJalur'])->name('pmb.jalur-render');
+    Route::post('/pmb/jalur',[App\Http\Controllers\Master\PMB\JalurPendaftaranController::class, 'handleJalur'])->name('pmb.jalur-handle');
+    Route::patch('/pmb/jalur/{code}',[App\Http\Controllers\Master\PMB\JalurPendaftaranController::class, 'updateJalur'])->name('pmb.jalur-update');
+    Route::delete('/pmb/jalur/{code}',[App\Http\Controllers\Master\PMB\JalurPendaftaranController::class, 'deleteJalur'])->name('pmb.jalur-delete');
+
+    // MASTER PMB => BIAYA PENDAFTARAN
+    Route::get('/pmb/biaya',[App\Http\Controllers\Master\PMB\BiayaPendaftaranController::class, 'renderBiaya'])->name('pmb.biaya-render');
+    Route::post('/pmb/biaya',[App\Http\Controllers\Master\PMB\BiayaPendaftaranController::class, 'handleBiaya'])->name('pmb.biaya-handle');
+    Route::patch('/pmb/biaya/{code}',[App\Http\Controllers\Master\PMB\BiayaPendaftaranController::class, 'updateBiaya'])->name('pmb.biaya-update');
+    Route::delete('/pmb/biaya/{code}',[App\Http\Controllers\Master\PMB\BiayaPendaftaranController::class, 'deleteBiaya'])->name('pmb.biaya-delete');
+
+    // MASTER PMB => SYARAT PENDAFTARAN
+    Route::get('/pmb/syarat',[App\Http\Controllers\Master\PMB\SyaratPendaftaranController::class, 'renderSyarat'])->name('pmb.syarat-render');
+    Route::post('/pmb/syarat',[App\Http\Controllers\Master\PMB\SyaratPendaftaranController::class, 'handleSyarat'])->name('pmb.syarat-handle');
+    Route::patch('/pmb/syarat/{code}',[App\Http\Controllers\Master\PMB\SyaratPendaftaranController::class, 'updateSyarat'])->name('pmb.syarat-update');
+    Route::delete('/pmb/syarat/{code}',[App\Http\Controllers\Master\PMB\SyaratPendaftaranController::class, 'deleteSyarat'])->name('pmb.syarat-delete');
+
+    // MASTER PMB => GELOMBANG PENDAFTARAN
+    Route::get('/pmb/gelombang',[App\Http\Controllers\Master\PMB\GelombangPendaftaranController::class, 'renderGelombang'])->name('pmb.gelombang-render');
+    Route::post('/pmb/gelombang',[App\Http\Controllers\Master\PMB\GelombangPendaftaranController::class, 'handleGelombang'])->name('pmb.gelombang-handle');
+    Route::patch('/pmb/gelombang/{code}',[App\Http\Controllers\Master\PMB\GelombangPendaftaranController::class, 'updateGelombang'])->name('pmb.gelombang-update');
+    Route::delete('/pmb/gelombang/{code}',[App\Http\Controllers\Master\PMB\GelombangPendaftaranController::class, 'deleteGelombang'])->name('pmb.gelombang-delete');
+
+    // MASTER PMB => JADWAL PMB
+    Route::get('/pmb/jadwal',[App\Http\Controllers\Master\PMB\JadwalPMBController::class, 'renderJadwal'])->name('pmb.jadwal-render');
+    Route::post('/pmb/jadwal',[App\Http\Controllers\Master\PMB\JadwalPMBController::class, 'handleJadwal'])->name('pmb.jadwal-handle');
+    Route::patch('/pmb/jadwal/{code}',[App\Http\Controllers\Master\PMB\JadwalPMBController::class, 'updateJadwal'])->name('pmb.jadwal-update');
+    Route::delete('/pmb/jadwal/{code}',[App\Http\Controllers\Master\PMB\JadwalPMBController::class, 'deleteJadwal'])->name('pmb.jadwal-delete');
+
+    // MASTER PMB => PENDAFTAR
+    Route::get('/pmb/pendaftar', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'renderPendaftar'])->name('pmb.pendaftar-render');
+    Route::post('/pmb/pendaftar', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'handlePendaftar'])->name('pmb.pendaftar-handle');
+    Route::patch('/pmb/pendaftar/{code}', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'updatePendaftar'])->name('pmb.pendaftar-update');
+    Route::delete('/pmb/pendaftar/{code}', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'deletePendaftar'])->name('pmb.pendaftar-delete');
+    Route::get('/pmb/pendaftar/{code}', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'renderDetail'])->name('pmb.pendaftar-detail');
+    Route::post('/pmb/pendaftar/{code}/dokumen', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'handleDokumen'])->name('pmb.pendaftar-dokumen-handle');
+    Route::patch('/pmb/pendaftar/{code}/validasi', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'validasiDokumen'])->name('pmb.pendaftar-validasi');
+    Route::get('/pmb/pendaftar/export/excel', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'exportPendaftarExcel'])->name('pmb.pendaftar-export-excel');
+    Route::get('/pmb/pendaftar/export/pdf', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'exportPendaftarPDF'])->name('pmb.pendaftar-export-pdf');
+    Route::post('/pmb/pendaftar/batch/validasi', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'batchValidasiDokumen'])->name('pmb.pendaftar-batch-validasi');
+    Route::post('/pmb/pendaftar/batch/status', [App\Http\Controllers\Master\PMB\PendaftarController::class, 'batchUpdateStatus'])->name('pmb.pendaftar-batch-status');
+
+    // MASTER PENGGUNA => USERS
+    Route::get('/pengguna/users',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'renderUsers'])->name('pengguna.users-render');
+    Route::get('/pengguna/users/{code}/views',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'viewUsers'])->name('pengguna.users-views');
+    Route::post('/pengguna/users',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'handleUsers'])->name('pengguna.users-handle');
+    Route::patch('/pengguna/users/{code}',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'updateUsers'])->name('pengguna.users-update');
+    Route::patch('/pengguna/users/{code}/profile', [App\Http\Controllers\Master\Pengguna\UsersController::class, 'handleProfile'])->name('pengguna.users-profile');
+    Route::delete('/pengguna/users/{code}',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'deleteUsers'])->name('pengguna.users-delete');
+
+    // MASTER PENGGUNA => DOSEN
+    Route::get('/pengguna/dosen',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'renderDosen'])->name('pengguna.dosen-render');
+    Route::get('/pengguna/dosen/{code}/views',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'viewDosen'])->name('pengguna.dosen-views');
+    Route::post('/pengguna/dosen',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'handleDosen'])->name('pengguna.dosen-handle');
+    Route::patch('/pengguna/dosen/{code}',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'updateDosen'])->name('pengguna.dosen-update');
+    Route::patch('/pengguna/dosen/{code}/profile', [App\Http\Controllers\Master\Pengguna\DosenController::class, 'handleProfile'])->name('pengguna.dosen-profile');
+    Route::delete('/pengguna/dosen/{code}',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'deleteDosen'])->name('pengguna.dosen-delete');
+
+    // MASTER PENGGUNA => MAHASISWA
+    Route::get('/pengguna/mahasiswa',[App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'renderMahasiswa'])->name('pengguna.mahasiswa-render');
+    Route::get('/pengguna/mahasiswa/{code}/views',[App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'viewMahasiswa'])->name('pengguna.mahasiswa-views');
+    Route::post('/pengguna/mahasiswa',[App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'handleMahasiswa'])->name('pengguna.mahasiswa-handle');
+    Route::patch('/pengguna/mahasiswa/{code}',[App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'updateMahasiswa'])->name('pengguna.mahasiswa-update');
+    Route::patch('/pengguna/mahasiswa/{code}/profile', [App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'handleProfile'])->name('pengguna.mahasiswa-profile');
+    Route::delete('/pengguna/mahasiswa/{code}',[App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'deleteMahasiswa'])->name('pengguna.mahasiswa-delete');
 
     // MASTER PUBLIKASI => KATEGORI
     Route::get('/publikasi/kategori', [App\Http\Controllers\Master\Publikasi\KategoriController::class, 'renderKategori'])->name('publikasi.kategori-render');
@@ -142,6 +208,8 @@ use Illuminate\Support\Facades\Route;
     Route::post('/publikasi/galeri', [App\Http\Controllers\Master\Publikasi\GaleriController::class, 'handleGaleri'])->name('publikasi.galeri-handle');
     Route::patch('/publikasi/galeri/{code}', [App\Http\Controllers\Master\Publikasi\GaleriController::class, 'updateGaleri'])->name('publikasi.galeri-update');
     Route::delete('/publikasi/galeri/{code}', [App\Http\Controllers\Master\Publikasi\GaleriController::class, 'deleteGaleri'])->name('publikasi.galeri-delete');
+
+    // MASTER PUBLIKASI => GALERI FOTO
     Route::post('/publikasi/galeri/{code}/foto', [App\Http\Controllers\Master\Publikasi\GaleriController::class, 'handleFoto'])->name('publikasi.galeri-foto-handle');
     Route::delete('/publikasi/galeri/foto/{code}', [App\Http\Controllers\Master\Publikasi\GaleriController::class, 'deleteFoto'])->name('publikasi.galeri-foto-delete');
 
@@ -210,6 +278,6 @@ use Illuminate\Support\Facades\Route;
     Route::post('/keuangan/tagihan-kuliah-group', [App\Http\Controllers\Master\Keuangan\TagihanKuliahGroupController::class, 'handleTagihanKuliahGroup'])->name('keuangan.tagihan-kuliah-group-handle');
     Route::patch('/keuangan/tagihan-kuliah-group/{code}', [App\Http\Controllers\Master\Keuangan\TagihanKuliahGroupController::class, 'updateTagihanKuliahGroup'])->name('keuangan.tagihan-kuliah-group-update');
     Route::delete('/keuangan/tagihan-kuliah-group/{code}', [App\Http\Controllers\Master\Keuangan\TagihanKuliahGroupController::class, 'deleteTagihanKuliahGroup'])->name('keuangan.tagihan-kuliah-group-delete');
-    Route::post('/keuangan/tagihan-kuliah-group/{code}/publish',[App\Http\Controllers\Master\Keuangan\TagihanKuliahGroupController::class, 'publishTagihanKuliahGroup'])->name('keuangan.tagihan-kuliah-group-publish');
-    Route::post('/keuangan/tagihan-kuliah-group/{code}/archive',[App\Http\Controllers\Master\Keuangan\TagihanKuliahGroupController::class, 'archiveTagihanKuliahGroup'])->name('keuangan.tagihan-kuliah-group-archive');
-    Route::get('/keuangan/tagihan-kuliah-group/{code}/detail',[App\Http\Controllers\Master\Keuangan\TagihanKuliahGroupController::class, 'viewTagihanDetail'])->name('keuangan.tagihan-kuliah-group-detail');
+    Route::post('/keuangan/tagihan-kuliah-group/{code}/publish', [App\Http\Controllers\Master\Keuangan\TagihanKuliahGroupController::class, 'publishTagihanKuliahGroup'])->name('keuangan.tagihan-kuliah-group-publish');
+    Route::post('/keuangan/tagihan-kuliah-group/{code}/archive', [App\Http\Controllers\Master\Keuangan\TagihanKuliahGroupController::class, 'archiveTagihanKuliahGroup'])->name('keuangan.tagihan-kuliah-group-archive');
+    Route::get('/keuangan/tagihan-kuliah-group/{code}/detail', [App\Http\Controllers\Master\Keuangan\TagihanKuliahGroupController::class, 'viewTagihanDetail'])->name('keuangan.tagihan-kuliah-group-detail');
