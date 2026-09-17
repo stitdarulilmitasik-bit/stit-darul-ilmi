@@ -32,7 +32,7 @@ if (! function_exists('stit_image_url')) {
         }
 
         if (Storage::disk('public')->exists($path)) {
-            return Storage::disk('public')->url($path);
+        return asset('storage/' . $path);
         }
 
         if (is_file(public_path($path))) {
