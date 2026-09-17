@@ -44,18 +44,24 @@ class GaleriController extends Controller
     {
         try {
             DB::beginTransaction();
+
             $request->validate([
                 'kategori_id' => 'required|exists:kategoris,id',
                 'name' => 'required|string|max:255',
                 'content' => 'required|string',
                 'photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:4096',
+                'photos' => 'nullable|array',
+                'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
+                'desc' => 'nullable|string|max:1000',
                 'status' => 'required|in:Draft,Publish,Archive'
             ]);
+
             $slug = Str::slug($request->name);
             $code = 'GLR-' . strtoupper(Str::random(8));
             $photoName = time() . '-' . $code . '-' . uniqid() . '.' . $request->photo->getClientOriginalExtension();
             $request->photo->storeAs('images/galeri', $photoName, 'public');
-            Galeri::create([
+
+            $galeri = Galeri::create([
                 'code' => $code,
                 'kategori_id' => $request->kategori_id,
                 'name' => $request->name,
@@ -65,9 +71,24 @@ class GaleriController extends Controller
                 'status' => $request->status,
                 'created_by' => Auth::id()
             ]);
+
+            foreach ($request->file('photos', []) as $photo) {
+                $fotoCode = 'FTO-' . strtoupper(Str::random(8));
+                $fotoName = time() . '-' . $fotoCode . '-' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                $photo->storeAs('images/galeri/foto', $fotoName, 'public');
+
+                GaleriFoto::create([
+                    'code' => $fotoCode,
+                    'galeri_id' => $galeri->id,
+                    'photo' => $fotoName,
+                    'desc' => $request->desc,
+                    'created_by' => Auth::id()
+                ]);
+            }
+
             DB::commit();
             $spref = Auth::user() ? Auth::user()->prefix : '';
-            return redirect()->route($spref . 'publikasi.galeri-render')->with('success', 'Galeri berhasil ditambahkan');
+            return redirect()->route($spref . 'publikasi.galeri-view', $code)->with('success', 'Galeri dan dokumentasi foto berhasil ditambahkan');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
