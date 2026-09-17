@@ -2,6 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 
+    // MASTER PENGATURAN => FRONT PAGE CMS
+    Route::get('/pengaturan/front-page', [App\Http\Controllers\Master\Pengaturan\HomepageController::class, 'index'])->name('pengaturan.front-page-render');
+    Route::post('/pengaturan/front-page', [App\Http\Controllers\Master\Pengaturan\HomepageController::class, 'store'])->name('pengaturan.front-page-store');
+    Route::patch('/pengaturan/front-page/{section}', [App\Http\Controllers\Master\Pengaturan\HomepageController::class, 'update'])->name('pengaturan.front-page-update');
+    Route::delete('/pengaturan/front-page/{section}', [App\Http\Controllers\Master\Pengaturan\HomepageController::class, 'destroy'])->name('pengaturan.front-page-delete');
+
     // MASTER AKADEMIK => TAHUN AKADEMIK
     Route::get('/akademik/tahun-akademik',[App\Http\Controllers\Master\Akademik\TahunAkademikController::class, 'renderTaka'])->name('akademik.taka-render');
     Route::post('/akademik/tahun-akademik',[App\Http\Controllers\Master\Akademik\TahunAkademikController::class, 'handleTaka'])->name('akademik.taka-handle');
@@ -160,7 +166,7 @@ use Illuminate\Support\Facades\Route;
     Route::patch('/pengguna/users/{code}/profile', [App\Http\Controllers\Master\Pengguna\UsersController::class, 'handleProfile'])->name('pengguna.users-profile');
     Route::delete('/pengguna/users/{code}',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'deleteUsers'])->name('pengguna.users-delete');
 
-    // MASTER PENGGUNA => USERS
+    // MASTER PENGGUNA => DOSEN
     Route::get('/pengguna/dosen',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'renderDosen'])->name('pengguna.dosen-render');
     Route::get('/pengguna/dosen/{code}/views',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'viewDosen'])->name('pengguna.dosen-views');
     Route::post('/pengguna/dosen',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'handleDosen'])->name('pengguna.dosen-handle');
