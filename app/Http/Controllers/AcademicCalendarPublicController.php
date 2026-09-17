@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengaturan\WebSetting;
 use App\Models\Publikasi\KalenderAkademik;
+use App\Models\Akademik\JadwalKuliah;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,6 @@ class AcademicCalendarPublicController extends Controller
         $today = Carbon::now('Asia/Jakarta')->startOfDay();
         $year = (int) $request->query('year', $today->year);
         $month = (int) $request->query('month', $today->month);
-
         if ($year < 2000 || $year > 2100) $year = $today->year;
         if ($month < 1 || $month > 12) $month = $today->month;
 
@@ -30,14 +30,20 @@ class AcademicCalendarPublicController extends Controller
                     ->orWhere(function ($q) use ($monthStart) {
                         $q->whereNotNull('ended_date')->whereDate('ended_date', '>=', $monthStart->toDateString());
                     });
-            })
-            ->orderBy('start_date')
-            ->get();
+            })->orderBy('start_date')->get();
 
         $days = [];
-        for ($date = $gridStart->copy(); $date <= $gridEnd; $date->addDay()) {
-            $days[] = $date->copy();
-        }
+        for ($date = $gridStart->copy(); $date <= $gridEnd; $date->addDay()) $days[] = $date->copy();
+
+        // Jadwal kuliah is a weekly recurring academic schedule. Load it separately
+        // so Saturday and the other teaching days are visible from the public page.
+        $dayMap = ['senin'=>'Monday','monday'=>'Monday','selasa'=>'Tuesday','tuesday'=>'Tuesday','rabu'=>'Wednesday','wednesday'=>'Wednesday','kamis'=>'Thursday','thursday'=>'Thursday','jumat'=>'Friday','jum\'at'=>'Friday','friday'=>'Friday','sabtu'=>'Saturday','saturday'=>'Saturday','minggu'=>'Sunday','sunday'=>'Sunday'];
+        $jadwalKuliah = JadwalKuliah::with(['mataKuliah','dosen','ruang','waktuKuliah','kelas'])
+            ->orderBy('hari')->orderBy('waktu_kuliah_id')->get()
+            ->map(function ($item) use ($dayMap) {
+                $item->normalized_day = $dayMap[strtolower(trim((string) $item->hari))] ?? $item->hari;
+                return $item;
+            })->groupBy('normalized_day');
 
         return view('central.pages.kalender-public', [
             'webs' => WebSetting::first(),
@@ -46,7 +52,7 @@ class AcademicCalendarPublicController extends Controller
             'monthEnd' => $monthEnd,
             'days' => $days,
             'events' => $events,
-            // core-mainpage is a shared layout and expects these variables.
+            'jadwalKuliah' => $jadwalKuliah,
             'user' => auth()->user(),
             'spref' => 'web-admin.',
             'menus' => 'Akademik',
