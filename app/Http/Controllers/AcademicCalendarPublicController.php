@@ -46,6 +46,12 @@ class AcademicCalendarPublicController extends Controller
             'monthEnd' => $monthEnd,
             'days' => $days,
             'events' => $events,
+            // core-mainpage is a shared layout and expects these variables.
+            'user' => auth()->user(),
+            'spref' => 'web-admin.',
+            'menus' => 'Akademik',
+            'pages' => 'Kalender Akademik',
+            'academy' => 'STIT Darul Ilmi Tasikmalaya',
         ]);
     }
 }
