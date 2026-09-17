@@ -11,6 +11,7 @@ Route::group(['prefix' => 'dosen', 'middleware' => ['checkUser:Dosen Aktif'], 'a
     Route::get('/profile',[App\Http\Controllers\Private\Dosen\RootController::class, 'renderProfile'])->name('profile-render');
     Route::patch('/profile',[App\Http\Controllers\Private\Dosen\RootController::class, 'handleProfile'])->name('profile-handle');
 
+    // MASTER AKADEMIK - READ ONLY UNTUK DOSEN
+    Route::get('/akademik/master',[App\Http\Controllers\Private\Dosen\AkademikController::class, 'index'])->name('akademik.master');
 
 });
-
