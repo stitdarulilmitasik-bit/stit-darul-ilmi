@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <title>Jadwal Mengajar Dosen</title>
     <style>
-        @page { margin: 28px 32px 35px; }
+        @page { margin: 25px 30px 32px; }
         body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #111; }
-        .kop { width: 100%; border-bottom: 3px solid #111; padding-bottom: 8px; margin-bottom: 14px; }
+        .kop { width: 100%; border-bottom: 3px solid #111; padding-bottom: 9px; margin-bottom: 15px; }
         .kop-table { width: 100%; border-collapse: collapse; }
-        .logo { width: 82px; text-align: center; vertical-align: middle; }
-        .logo img { width: 68px; height: 68px; object-fit: contain; }
+        .logo { width: 125px; text-align: center; vertical-align: middle; }
+        .logo img { width: 105px; height: 105px; object-fit: contain; }
         .kop-text { text-align: center; line-height: 1.35; }
         .kop-text .line1 { font-size: 15px; font-weight: bold; }
-        .kop-text .line2 { font-size: 17px; font-weight: bold; }
+        .kop-text .line2 { font-size: 18px; font-weight: bold; }
         .kop-text .line3 { font-size: 10px; font-weight: bold; }
         .kop-text .address { font-size: 9px; }
         h2 { text-align: center; font-size: 14px; margin: 12px 0 4px; }
@@ -34,7 +34,7 @@
             <tr>
                 <td class="logo">
                     @if($logo)
-                        <img src="{{ $logo }}" alt="Logo STIT">
+                        <img src="{{ $logo }}" alt="Logo STIT Darul Ilmi">
                     @endif
                 </td>
                 <td class="kop-text">
@@ -43,7 +43,7 @@
                     <div class="line3">SK Menteri Agama RI No. 536</div>
                     <div class="address">Alamat : Jl. Cirahayu Sindangraja Jamanis Kabupaten Tasikmalaya Jawa Barat 46175</div>
                 </td>
-                <td style="width:82px"></td>
+                <td style="width:125px"></td>
             </tr>
         </table>
     </div>
@@ -64,8 +64,7 @@
             <tr>
                 <th width="4%">No.</th>
                 <th width="22%">Mata Kuliah</th>
-                <th width="12%">Tanggal</th>
-                <th width="10%">Hari</th>
+                <th width="18%">Hari, Tanggal</th>
                 <th width="15%">Jam Kuliah</th>
                 <th width="12%">Kelas</th>
                 <th width="10%">Ruang</th>
@@ -79,19 +78,21 @@
                 $mulai = $waktu?->time_start;
                 $selesai = $waktu?->time_ended;
                 $kelas = $item->kelas->pluck('name')->filter()->join(', ');
+                $tanggal = $item->tanggal ? \Carbon\Carbon::parse($item->tanggal)->locale('id') : null;
+                $hari = $item->hari ?: ($tanggal ? $tanggal->translatedFormat('l') : '-');
+                $tanggalText = $tanggal ? $tanggal->translatedFormat('d F Y') : '-';
             @endphp
             <tr>
                 <td class="center">{{ $no + 1 }}</td>
                 <td><strong>{{ $item->mataKuliah->name ?? '-' }}</strong>@if(!empty($item->mataKuliah->code))<br><small>{{ $item->mataKuliah->code }}</small>@endif</td>
-                <td class="center">{{ $item->tanggal ? \Carbon\Carbon::parse($item->tanggal)->locale('id')->translatedFormat('d F Y') : '-' }}</td>
-                <td class="center">{{ $item->hari ?: ($item->tanggal ? \Carbon\Carbon::parse($item->tanggal)->locale('id')->translatedFormat('l') : '-') }}</td>
+                <td class="center"><strong>{{ $hari }}</strong><br>{{ $tanggalText }}</td>
                 <td class="center">{{ $mulai ? \Carbon\Carbon::parse($mulai)->format('H:i') : '-' }} - {{ $selesai ? \Carbon\Carbon::parse($selesai)->format('H:i') : '-' }}</td>
                 <td class="center">{{ $kelas ?: '-' }}</td>
                 <td class="center">{{ $item->ruang->name ?? '-' }}</td>
                 <td class="center">{{ $item->metode ?? '-' }}</td>
             </tr>
         @empty
-            <tr><td colspan="8" class="center">Belum ada jadwal mengajar.</td></tr>
+            <tr><td colspan="7" class="center">Belum ada jadwal mengajar.</td></tr>
         @endforelse
         </tbody>
     </table>
