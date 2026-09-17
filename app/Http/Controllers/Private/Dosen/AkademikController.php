@@ -11,6 +11,8 @@ use App\Models\Akademik\Fakultas;
 use App\Models\Akademik\Kurikulum;
 use App\Models\Akademik\MataKuliah;
 use App\Models\Akademik\Kelas;
+use App\Models\Akademik\JenisKelas;
+use App\Models\Akademik\WaktuKuliah;
 use App\Models\Akademik\JadwalKuliah;
 
 class AkademikController extends Controller
@@ -26,7 +28,7 @@ class AkademikController extends Controller
             'user' => $user,
             'webs' => $webs,
             'spref' => $user->prefix ?? 'dosen.',
-            'menus' => 'Akademik',
+            'menus' => 'Master',
             'pages' => 'Master Akademik',
             'academy' => $webs ? $webs->school_apps . ' by ' . $webs->school_name : 'SIAKAD',
             'taka' => TahunAkademik::latest()->get(),
@@ -34,8 +36,10 @@ class AkademikController extends Controller
             'prodi' => ProgramStudi::with('fakultas')->latest()->get(),
             'kurikulum' => Kurikulum::latest()->get(),
             'matakuliah' => MataKuliah::with(['programStudi', 'kurikulum'])->latest()->get(),
-            'kelas' => Kelas::latest()->get(),
-            'jadwal' => JadwalKuliah::latest()->get(),
+            'jenisKelas' => JenisKelas::latest()->get(),
+            'kelas' => Kelas::with(['tahunAkademik', 'programStudi', 'jenisKelas'])->latest()->get(),
+            'waktuKuliah' => WaktuKuliah::with('jenisKelas')->latest()->get(),
+            'jadwal' => JadwalKuliah::with(['mataKuliah', 'dosen', 'ruang', 'jenisKelas', 'waktuKuliah'])->latest()->get(),
         ]);
     }
 }
