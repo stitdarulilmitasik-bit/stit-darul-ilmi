@@ -32,6 +32,11 @@ class CmsHomeController extends Controller
             'kalender' => KalenderAkademik::where('status', 'Publish')->orderBy('start_date')->take(6)->get(),
             'programStudis' => ProgramStudi::where('status', 'Aktif')->with('fakultas')->orderBy('name')->take(6)->get(),
             'fakultas' => Fakultas::withCount(['programStudis' => fn ($q) => $q->where('status', 'Aktif')])->take(3)->get(),
+            // core-mainpage expects these title variables. Keep them explicit
+            // so the public CMS homepage can render independently of legacy
+            // global view composers.
+            'pages' => 'Beranda',
+            'academy' => 'STIT Darul Ilmi Tasikmalaya',
         ]);
     }
 }
