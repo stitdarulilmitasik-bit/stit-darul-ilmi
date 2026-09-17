@@ -63,8 +63,37 @@
                     @php
                         $tanggal = $item->tanggal ?? null;
                         $hari = $item->hari ?? null;
-                        $mulai = data_get($item, 'waktuKuliah.jam_mulai') ?? data_get($item, 'waktuKuliah.start') ?? data_get($item, 'waktuKuliah.start_time');
-                        $selesai = data_get($item, 'waktuKuliah.jam_selesai') ?? data_get($item, 'waktuKuliah.end') ?? data_get($item, 'waktuKuliah.end_time');
+                        $waktu = $item->waktuKuliah;
+                        $waktuAttributes = $waktu ? $waktu->getAttributes() : [];
+                        $jadwalAttributes = $item->getAttributes();
+
+                        // Gunakan jam yang benar-benar tersimpan pada data Jadwal Kuliah,
+                        // lalu fallback ke master Waktu Kuliah jika kolom jam berada di relasi tersebut.
+                        $ambilJam = function (array $attributes, array $keys) {
+                            foreach ($keys as $key) {
+                                if (array_key_exists($key, $attributes) && filled($attributes[$key])) {
+                                    return $attributes[$key];
+                                }
+                            }
+                            return null;
+                        };
+
+                        $mulai = $ambilJam($jadwalAttributes, ['jam_mulai', 'waktu_mulai', 'start_time', 'start', 'mulai', 'time_start']);
+                        $selesai = $ambilJam($jadwalAttributes, ['jam_selesai', 'waktu_selesai', 'end_time', 'end', 'selesai', 'time_end']);
+
+                        if (!$mulai) {
+                            $mulai = $ambilJam($waktuAttributes, ['jam_mulai', 'waktu_mulai', 'start_time', 'start', 'mulai', 'time_start']);
+                        }
+                        if (!$selesai) {
+                            $selesai = $ambilJam($waktuAttributes, ['jam_selesai', 'waktu_selesai', 'end_time', 'end', 'selesai', 'time_end']);
+                        }
+
+                        // Jika master Waktu Kuliah menyimpan satu label jam, tampilkan label tersebut.
+                        $labelWaktu = $ambilJam($jadwalAttributes, ['jam', 'waktu', 'time', 'range_jam', 'jam_kuliah']);
+                        if (!$labelWaktu) {
+                            $labelWaktu = $ambilJam($waktuAttributes, ['jam', 'waktu', 'time', 'range_jam', 'jam_kuliah', 'name']);
+                        }
+
                         $kelas = $item->kelas->pluck('name')->filter()->join(', ');
                         $metode = $item->metode ?? data_get($item, 'method') ?? '-';
                     @endphp
@@ -79,7 +108,13 @@
                         <td>{{ $hari ?: ($tanggal ? \Carbon\Carbon::parse($tanggal)->locale('id')->translatedFormat('l') : '-') }}</td>
                         <td>
                             <span class="badge bg-blue-lt">
-                                {{ $mulai || $selesai ? trim(($mulai ?: '-') . ' - ' . ($selesai ?: '-')) : '-' }}
+                                @if($mulai || $selesai)
+                                    {{ $mulai ?: '-' }} - {{ $selesai ?: '-' }}
+                                @elseif($labelWaktu)
+                                    {{ $labelWaktu }}
+                                @else
+                                    -
+                                @endif
                             </span>
                         </td>
                         <td>{{ $kelas ?: '-' }}</td>
