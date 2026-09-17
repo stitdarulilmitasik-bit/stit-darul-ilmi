@@ -4,16 +4,13 @@ namespace App\Http\Controllers\Master\Pengguna;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-// Use System
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-// Use Models
 use App\Models\Dosen;
 use App\Models\Pengaturan\WebSetting;
-// Use Plugins
 
 class DosenController extends Controller
 {
@@ -26,7 +23,6 @@ class DosenController extends Controller
         $data['pages'] = "Dosen";
         $data['academy'] = $data['webs']->school_apps . ' by ' . $data['webs']->school_name;
         $data['dosen'] = Dosen::latest()->get();
-        
         return view('master.pengguna.dosen-index', $data, compact('user'));
     }
 
@@ -39,7 +35,6 @@ class DosenController extends Controller
         $data['pages'] = "Dosen";
         $data['academy'] = $data['webs']->school_apps . ' by ' . $data['webs']->school_name;
         $data['dosen'] = Dosen::where('code', $code)->first();
-        
         return view('master.pengguna.dosen-views', $data, compact('user'));
     }
 
@@ -47,10 +42,7 @@ class DosenController extends Controller
     {
         try {
             DB::beginTransaction();
-            
             $dosen = Dosen::where('code', $code)->firstOrFail();
-            
-            // Base validation rules
             $rules = [
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:dosens,email,' . $dosen->id,
@@ -108,8 +100,6 @@ class DosenController extends Controller
                 'edu3_graduate_year' => 'nullable|string',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
             ];
-
-            // Add conditional validation for domicile address
             if ($request->domicile_same === 'No') {
                 $rules['domicile_addres'] = 'required|string';
                 $rules['domicile_rt'] = 'required|string';
@@ -120,25 +110,16 @@ class DosenController extends Controller
                 $rules['domicile_province'] = 'required|string';
                 $rules['domicile_poscode'] = 'required|string';
             }
-
             $request->validate($rules);
-
             $updateData = $request->except(['_token', '_method', 'photo']);
-            
-            // Handle photo upload
             if ($request->hasFile('photo')) {
-                // Hapus foto lama
                 if ($dosen->photo && $dosen->photo !== 'default.jpg') {
                     Storage::disk('public')->delete('images/profile/' . $dosen->photo);
                 }
-            
-                // Simpan foto baru
-                $photoName = time() . '-' . $dosen->code . '-' . uniqid() .'.' . $request->photo->getClientOriginalExtension();
+                $photoName = time() . '-' . $dosen->code . '-' . uniqid() . '.' . $request->photo->getClientOriginalExtension();
                 $request->photo->storeAs('images/profile', $photoName, 'public');
                 $updateData['photo'] = $photoName;
             }
-
-            // Handle domicile address
             if ($request->domicile_same === 'Yes') {
                 $updateData['domicile_addres'] = $request->ktp_addres;
                 $updateData['domicile_rt'] = $request->ktp_rt;
@@ -149,10 +130,8 @@ class DosenController extends Controller
                 $updateData['domicile_province'] = $request->ktp_province;
                 $updateData['domicile_poscode'] = $request->ktp_poscode;
             }
-
             $updateData['updated_by'] = Auth::id();
             $dosen->update($updateData);
-
             DB::commit();
             $spref = Auth::user() ? Auth::user()->prefix : '';
             return redirect()->route($spref . 'pengguna.dosen-views', $code)->with('success', 'Profile berhasil diperbarui');
@@ -166,27 +145,25 @@ class DosenController extends Controller
     {
         try {
             DB::beginTransaction();
-            
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:dosens,email',
                 'phone' => 'required|string|unique:dosens,phone',
                 'password' => 'required|string|min:6',
-                'type' => 'required|integer|between:0,7'
+                'type' => 'required|integer|in:0,1',
+                'status_dosen' => 'required|in:Dosen Tetap,Dosen Tidak Tetap'
             ]);
-
             $code = 'DSN-' . strtoupper(Str::random(8));
-            
-            $dosen = Dosen::create([
+            Dosen::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'password' => Hash::make($request->password),
                 'code' => $code,
                 'type' => $request->type,
+                'status_dosen' => $request->status_dosen,
                 'created_by' => Auth::id()
             ]);
-
             DB::commit();
             $spref = Auth::user() ? Auth::user()->prefix : '';
             return redirect()->route($spref . 'pengguna.dosen-render')->with('success', 'Dosen berhasil ditambahkan');
@@ -200,31 +177,27 @@ class DosenController extends Controller
     {
         try {
             DB::beginTransaction();
-            
             $dosen = Dosen::where('code', $code)->firstOrFail();
-            
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:dosens,email,' . $dosen->id,
                 'phone' => 'required|string|unique:dosens,phone,' . $dosen->id,
                 'password' => 'nullable|string|min:6',
-                'type' => 'required|integer|between:0,7'
+                'type' => 'required|integer|in:0,1',
+                'status_dosen' => 'required|in:Dosen Tetap,Dosen Tidak Tetap'
             ]);
-
             $updateData = [
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'type' => $request->type,
+                'status_dosen' => $request->status_dosen,
                 'updated_by' => Auth::id()
             ];
-            
             if ($request->filled('password')) {
                 $updateData['password'] = Hash::make($request->password);
             }
-            
             $dosen->update($updateData);
-
             DB::commit();
             $spref = Auth::user() ? Auth::user()->prefix : '';
             return redirect()->route($spref . 'pengguna.dosen-render')->with('success', 'Data dosen berhasil diperbarui');
@@ -238,22 +211,14 @@ class DosenController extends Controller
     {
         try {
             DB::beginTransaction();
-
             $dosen = Dosen::where('code', $code)->firstOrFail();
-            
-            // Prevent self-deletion
             if ($dosen->id === Auth::id()) {
                 return redirect()->back()->with('error', 'Tidak dapat menghapus akun sendiri');
             }
-
-            $dosen->update([
-                'deleted_by' => Auth::id()
-            ]);
+            $dosen->update(['deleted_by' => Auth::id()]);
             $dosen->delete();
-
             DB::commit();
             return redirect()->back()->with('success', 'Dosen berhasil dihapus');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal menghapus Dosen: ' . $e->getMessage());
