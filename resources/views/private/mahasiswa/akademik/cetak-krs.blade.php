@@ -1,14 +1,23 @@
 <!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cetak KRS - {{ $mahasiswa->name ?? $mahasiswa->numb_nim }}</title>
 <style>
 @page { size: A4 portrait; margin: 15mm; }
 body { font-family: Arial, sans-serif; color:#111; font-size:12px; }
-.header { text-align:center; border-bottom:2px solid #111; padding-bottom:10px; margin-bottom:14px; }
-.header h2,.header h3,.header p { margin:2px 0; }
+.no-print { margin-bottom:15px; }
+.kop { width:100%; border-bottom:3px solid #111; padding-bottom:9px; margin-bottom:15px; }
+.kop-table { width:100%; border-collapse:collapse; }
+.kop-table td { border:0; padding:0; }
+.logo { width:105px; text-align:center; vertical-align:middle; }
+.logo img { width:88px; height:88px; object-fit:contain; }
+.kop-text { text-align:center; line-height:1.35; }
+.kop-text .line1 { font-size:15px; font-weight:bold; }
+.kop-text .line2 { font-size:18px; font-weight:bold; }
+.kop-text .line3 { font-size:10px; font-weight:bold; }
+.kop-text .address { font-size:9px; }
 table { width:100%; border-collapse:collapse; }
 th,td { border:1px solid #222; padding:6px; }
 th { background:#eee; }
@@ -16,17 +25,41 @@ th { background:#eee; }
 .text-center{text-align:center}.text-right{text-align:right}
 .signature { margin-top:35px; width:100%; display:flex; justify-content:flex-end; }
 .signature-box { width:220px; text-align:center; }
-.no-print { margin-bottom:15px; }
 @media print { .no-print { display:none; } }
 </style>
 </head>
 <body>
 <div class="no-print"><button onclick="window.print()">Cetak / Print</button></div>
-<div class="header">
-    <h2>{{ $webs->school_name ?? 'PERGURUAN TINGGI' }}</h2>
-    <p>{{ $webs->school_address ?? '' }}</p>
-    <h3>KARTU RENCANA STUDI (KRS)</h3>
-    <p>{{ $currentSemester->name ?? '' }} - {{ $currentSemester->type ?? '' }}</p>
+<div class="kop">
+    <table class="kop-table">
+        <tr>
+            <td class="logo">
+                @php
+                    $logoCandidates = [storage_path('app/public/images/logo/logo-vert.png'), public_path('storage/images/logo/logo-vert.png')];
+                    $logo = null;
+                    foreach ($logoCandidates as $candidate) {
+                        if (is_file($candidate)) {
+                            $mime = mime_content_type($candidate) ?: 'image/png';
+                            $logo = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($candidate));
+                            break;
+                        }
+                    }
+                @endphp
+                @if($logo)<img src="{{ $logo }}" alt="Logo STIT Darul Ilmi">@endif
+            </td>
+            <td class="kop-text">
+                <div class="line1">SEKOLAH TINGGI ILMU TARBIYAH</div>
+                <div class="line2">STIT DARUL ILMI TASIKMALAYA</div>
+                <div class="line3">SK Menteri Agama RI No. 536 Tahun 2026</div>
+                <div class="address">Alamat : Jl. Cirahayu Sindangraja Jamanis Kabupaten Tasikmalaya Jawa Barat 46175</div>
+            </td>
+            <td style="width:105px"></td>
+        </tr>
+    </table>
+</div>
+<div style="text-align:center; margin-bottom:14px;">
+    <h3 style="margin:2px 0;">KARTU RENCANA STUDI (KRS)</h3>
+    <p style="margin:2px 0;">{{ $currentSemester->name ?? '' }} - {{ $currentSemester->type ?? '' }}</p>
 </div>
 <table class="meta">
 <tr><td width="18%">Nama</td><td>: {{ $mahasiswa->name ?? '-' }}</td><td width="18%">NIM</td><td>: {{ $mahasiswa->numb_nim ?? '-' }}</td></tr>
@@ -52,13 +85,7 @@ th { background:#eee; }
 </tbody>
 <tfoot><tr><th colspan="3" class="text-right">Total SKS</th><th class="text-center">{{ $krs->sum('sks') }}</th><th colspan="2"></th></tr></tfoot>
 </table>
-<div class="signature">
-<div class="signature-box">
-<p>Mengetahui,<br>Dosen Pembimbing Akademik</p>
-<br><br><br>
-<strong>{{ $krsHeader->dosenPA->name ?? '________________________' }}</strong>
-</div>
-</div>
+<div class="signature"><div class="signature-box"><p>Mengetahui,<br>Dosen Pembimbing Akademik</p><br><br><br><strong>{{ $krsHeader->dosenPA->name ?? '________________________' }}</strong></div></div>
 <script>window.addEventListener('load', function(){ setTimeout(function(){ window.print(); }, 350); });</script>
 </body>
 </html>
