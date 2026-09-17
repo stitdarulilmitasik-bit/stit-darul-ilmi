@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Private\Mahasiswa;
 
 use App\Http\Controllers\Controller;
+use App\Models\Layanan\CutiAkademik;
 use App\Models\Pengaturan\WebSetting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -69,12 +70,47 @@ class LayananController extends Controller
 
     public function ajukanCuti(Request $request)
     {
-        return back()->with('success', 'Pengajuan cuti akademik berhasil dikirim.');
+        $user = $this->mahasiswa();
+
+        if (!$user) {
+            abort(403, 'Sesi mahasiswa tidak ditemukan. Silakan login kembali sebagai mahasiswa.');
+        }
+
+        $data = $request->validate([
+            'semester' => 'required|string|max:30',
+            'tanggal_mulai' => 'nullable|date',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'alasan' => 'required|string|max:2000',
+            'alamat_selama_cuti' => 'nullable|string|max:500',
+            'no_telepon' => 'nullable|string|max:30',
+            'file_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        if ($request->hasFile('file_pendukung')) {
+            $data['file_pendukung'] = $request->file('file_pendukung')->store('cuti-akademik', 'public');
+        }
+
+        $data['mahasiswa_id'] = $user->id;
+        $data['tanggal_pengajuan'] = now()->toDateString();
+        $data['status'] = 'Diajukan';
+
+        CutiAkademik::create($data);
+
+        return redirect()
+            ->route('mahasiswa.layanan.cuti')
+            ->with('success', 'Pengajuan cuti akademik berhasil dikirim dan menunggu verifikasi bagian akademik.');
     }
 
     public function cutiAkademik()
     {
-        return view('private.mahasiswa.layanan.cuti-akademik', $this->layoutData('Cuti Akademik'));
+        $user = $this->mahasiswa();
+        $pengajuan = $user
+            ? CutiAkademik::where('mahasiswa_id', $user->id)->latest('tanggal_pengajuan')->latest('id')->get()
+            : collect();
+
+        return view('private.mahasiswa.layanan.cuti-akademik', $this->layoutData('Cuti Akademik', [
+            'pengajuan' => $pengajuan,
+        ]));
     }
 
     public function suratAktifKuliah()
