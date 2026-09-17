@@ -51,39 +51,10 @@ class LayananController extends Controller
         abort_unless($user,403);
         $w=WebSetting::first();
 
-        // Ambil jabatan dari master Jabatan Dosen jika tabel tersedia.
-        // Filter hanya jabatan yang relevan untuk penandatangan surat.
-        $jabatanDosen = collect();
-        foreach (['jabatan_dosens', 'jabatan_dosen'] as $table) {
-            if (!Schema::hasTable($table)) {
-                continue;
-            }
-            $columns = Schema::getColumnListing($table);
-            $nameColumn = collect(['name','nama','title','jabatan'])->first(fn($c) => in_array($c, $columns, true));
-            if (!$nameColumn) {
-                continue;
-            }
-            $jabatanDosen = DB::table($table)
-                ->select(array_values(array_unique([$nameColumn, in_array('id',$columns,true) ? 'id' : $nameColumn])))
-                ->where(function($q) use ($nameColumn) {
-                    $q->where($nameColumn, 'like', '%Ketua STIT%')
-                      ->orWhere($nameColumn, 'like', '%Pembantu Ketua%')
-                      ->orWhere($nameColumn, 'like', '%Ketua%');
-                })
-                ->orderBy($nameColumn)
-                ->get()
-                ->map(fn($row) => (object)['id'=>$row->id ?? null, 'name'=>$row->{$nameColumn}])
-                ->values();
-            break;
-        }
-
-        // Jika master belum tersedia/masih kosong, tetap tampilkan dua jabatan resmi yang diminta.
-        if ($jabatanDosen->isEmpty()) {
-            $jabatanDosen = collect([
-                (object)['id'=>'ketua', 'name'=>'Ketua STIT Darul Ilmi Tasikmalaya'],
-                (object)['id'=>'pembantu-ketua', 'name'=>'Pembantu Ketua STIT Darul Ilmi Tasikmalaya'],
-            ]);
-        }
+        $jabatanDosen = collect([
+            (object)['id'=>'ketua', 'name'=>'Ketua STIT Darul Ilmi Tasikmalaya'],
+            (object)['id'=>'wakil-ketua', 'name'=>'Wakil Ketua STIT Darul Ilmi Tasikmalaya'],
+        ]);
 
         return view('private.mahasiswa.layanan.surat-aktif-kuliah',[
             'webs'=>$w,
@@ -103,9 +74,7 @@ class LayananController extends Controller
         $data=$request->validate([
             'nomor_surat'=>'nullable|string|max:100',
             'tanggal_surat'=>'required|date',
-            'pejabat_nama'=>'required|string|max:150',
-            'pejabat_nip'=>'required|string|max:100',
-            'pejabat_jabatan'=>'required|string|max:150',
+            'pejabat_jabatan'=>'required|in:Ketua STIT Darul Ilmi Tasikmalaya,Wakil Ketua STIT Darul Ilmi Tasikmalaya',
             'nik'=>'required|string|max:50',
             'ttl'=>'required|string|max:200',
             'alamat'=>'required|string|max:500',
@@ -115,6 +84,20 @@ class LayananController extends Controller
             'tahun_akademik'=>'required|string|max:50',
             'keperluan'=>'required|string|max:200',
         ]);
+
+        $penandaTangan = [
+            'Ketua STIT Darul Ilmi Tasikmalaya' => [
+                'nama'=>'Dr. H. Dudung Rahmat Hidayat, M.Pd.',
+                'nip'=>'12000',
+            ],
+            'Wakil Ketua STIT Darul Ilmi Tasikmalaya' => [
+                'nama'=>'Aa Sudirman, M.Pd.I',
+                'nip'=>'12001',
+            ],
+        ];
+        $ttd=$penandaTangan[$data['pejabat_jabatan']];
+        $data['pejabat_nama']=$ttd['nama'];
+        $data['pejabat_nip']=$ttd['nip'];
         $data['nomor_surat']=$data['nomor_surat'] ?: 'SKAK/'.now()->format('m/Y').'/'.$user->numb_nim;
         $data['nama']=$user->name;
         $data['nim']=$user->numb_nim;
