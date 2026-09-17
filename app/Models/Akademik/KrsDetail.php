@@ -66,6 +66,11 @@ class KrsDetail extends Model
         return $this->belongsTo(Dosen::class, 'dosen_id');
     }
 
+    public function nilai()
+    {
+        return $this->hasOne(Nilai::class, 'krs_detail_id');
+    }
+
     // SCOPE METHODS
     public function scopeAktif($query)
     {
