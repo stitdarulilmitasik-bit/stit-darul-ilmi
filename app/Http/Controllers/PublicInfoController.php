@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Pengaturan\WebSetting;
+
+class PublicInfoController extends Controller
+{
+    public function show(string $page = 'profil')
+    {
+        $webs = WebSetting::first();
+        $pages = [
+            'profil' => [
+                'title' => 'Profil Kampus',
+                'heading' => 'Profil Kampus',
+                'content' => $webs?->school_desc ?: 'Informasi profil kampus belum diisi.',
+            ],
+            'visi-misi' => [
+                'title' => 'Visi & Misi',
+                'heading' => 'Visi & Misi',
+                'vision' => 'Menjadi perguruan tinggi yang unggul, berintegritas, adaptif terhadap perkembangan ilmu pengetahuan dan teknologi, serta berkontribusi bagi masyarakat.',
+                'missions' => [
+                    'Menyelenggarakan pendidikan tinggi yang bermutu dan relevan dengan kebutuhan masyarakat.',
+                    'Mengembangkan penelitian dan pengabdian kepada masyarakat secara berkelanjutan.',
+                    'Membangun tata kelola perguruan tinggi yang transparan, akuntabel, dan berorientasi pada mutu.',
+                    'Mendorong pengembangan karakter, kompetensi, dan profesionalitas sivitas akademika.',
+                ],
+            ],
+            'struktur-organisasi' => [
+                'title' => 'Struktur Organisasi',
+                'heading' => 'Struktur Organisasi',
+                'structure' => [
+                    'Ketua/Rektor',
+                    'Wakil Ketua/Wakil Rektor',
+                    'Senat Perguruan Tinggi',
+                    'Program Studi',
+                    'Bagian Administrasi Akademik',
+                    'Bagian Keuangan dan Umum',
+                    'Lembaga Penelitian dan Pengabdian kepada Masyarakat',
+                    'Unit Penunjang Akademik',
+                ],
+            ],
+            'fasilitas' => [
+                'title' => 'Fasilitas',
+                'heading' => 'Fasilitas Kampus',
+                'content' => 'Informasi fasilitas kampus dapat diperbarui melalui pengaturan website.',
+            ],
+            'kontak' => [
+                'title' => 'Kontak',
+                'heading' => 'Kontak Kampus',
+                'content' => $webs?->school_address ?: 'Alamat kampus belum diisi.',
+            ],
+            'jadwal-kuliah' => ['title'=>'Jadwal Kuliah', 'heading'=>'Jadwal Kuliah', 'content'=>'Jadwal kuliah tersedia melalui portal SIAKAD mahasiswa.'],
+            'silabus' => ['title'=>'Silabus', 'heading'=>'Silabus', 'content'=>'Silabus mata kuliah tersedia melalui portal akademik.'],
+            'e-learning' => ['title'=>'E-Learning', 'heading'=>'E-Learning', 'content'=>'Layanan E-Learning akan tersedia melalui portal pembelajaran.'],
+            'organisasi' => ['title'=>'Organisasi Mahasiswa', 'heading'=>'Organisasi Mahasiswa', 'content'=>'Informasi organisasi mahasiswa akan ditampilkan di halaman ini.'],
+            'beasiswa' => ['title'=>'Beasiswa', 'heading'=>'Beasiswa', 'content'=>'Informasi beasiswa akan ditampilkan di halaman ini.'],
+            'prestasi' => ['title'=>'Prestasi Mahasiswa', 'heading'=>'Prestasi Mahasiswa', 'content'=>'Informasi prestasi mahasiswa akan ditampilkan di halaman ini.'],
+            'alumni' => ['title'=>'Alumni', 'heading'=>'Alumni', 'content'=>'Informasi alumni akan ditampilkan di halaman ini.'],
+            'perpustakaan' => ['title'=>'Perpustakaan', 'heading'=>'Perpustakaan', 'content'=>'Layanan perpustakaan kampus.'],
+            'laboratorium' => ['title'=>'Laboratorium', 'heading'=>'Laboratorium', 'content'=>'Informasi laboratorium kampus.'],
+            'kemahasiswaan' => ['title'=>'Kemahasiswaan', 'heading'=>'Kemahasiswaan', 'content'=>'Layanan kemahasiswaan kampus.'],
+            'keuangan' => ['title'=>'Keuangan', 'heading'=>'Keuangan', 'content'=>'Informasi layanan keuangan kampus.'],
+        ];
+
+        abort_unless(isset($pages[$page]), 404);
+
+        return view('central.pages.public-info', [
+            'webs' => $webs,
+            'menus' => 'Institusi',
+            'pages' => $pages[$page]['title'],
+            'academy' => $webs ? $webs->school_apps . ' by ' . $webs->school_name : 'SIAKAD',
+            'info' => $pages[$page],
+            'user' => auth()->user() ?: auth()->guard('dosen')->user() ?: auth()->guard('mahasiswa')->user(),
+        ]);
+    }
+}
