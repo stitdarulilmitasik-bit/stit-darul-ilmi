@@ -131,10 +131,17 @@ class RootController extends Controller
               ->orWhere('dosen3_id', $user->id);
         })->with('programStudi')->get();
 
-        // Jadwal dashboard mengikuti mata kuliah yang memang diampu dosen login.
+        // Tampilkan jadwal jika dosen tercatat langsung pada jadwal ATAU
+        // mata kuliahnya tercatat sebagai mata kuliah yang diampu dosen.
+        // Ini mengakomodasi data jadwal lama maupun jadwal yang dibuat dari menu Dosen.
         $mataKuliahIds = $mataKuliah->pluck('id');
         $jadwal = JadwalKuliah::with(['mataKuliah.programStudi', 'ruang', 'jenisKelas', 'waktuKuliah', 'kelas'])
-            ->whereIn('matkul_id', $mataKuliahIds)
+            ->where(function ($q) use ($user, $mataKuliahIds) {
+                $q->where('dosen_id', $user->id);
+                if ($mataKuliahIds->isNotEmpty()) {
+                    $q->orWhereIn('matkul_id', $mataKuliahIds);
+                }
+            })
             ->orderByRaw('CASE WHEN tanggal IS NULL THEN 1 ELSE 0 END')
             ->orderBy('tanggal')
             ->orderBy('waktu_kuliah_id')
