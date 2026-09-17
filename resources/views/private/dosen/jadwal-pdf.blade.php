@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Jadwal Kuliah Dosen</title>
+    <title>Jadwal Mengajar Dosen</title>
     <style>
         @page { margin: 28px 32px 35px; }
         body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #111; }
@@ -48,7 +48,7 @@
         </table>
     </div>
 
-    <h2>JADWAL KULIAH DOSEN</h2>
+    <h2>JADWAL MENGAJAR DOSEN</h2>
     <div class="subtitle">STIT Darul Ilmi Tasikmalaya</div>
 
     <table class="info">
@@ -91,7 +91,7 @@
                 <td class="center">{{ $item->metode ?? '-' }}</td>
             </tr>
         @empty
-            <tr><td colspan="8" class="center">Belum ada jadwal kuliah.</td></tr>
+            <tr><td colspan="8" class="center">Belum ada jadwal mengajar.</td></tr>
         @endforelse
         </tbody>
     </table>
