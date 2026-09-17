@@ -8,11 +8,10 @@ Route::group(['prefix' => 'dosen', 'middleware' => ['checkUser:Dosen Aktif'], 'a
     Route::get('/profile',[App\Http\Controllers\Private\Dosen\RootController::class, 'renderProfile'])->name('profile-render');
     Route::patch('/profile',[App\Http\Controllers\Private\Dosen\RootController::class, 'handleProfile'])->name('profile-handle');
 
-    Route::get('/akademik/master',[App\Http\Controllers\Private\Dosen\AkademikController::class, 'index'])->name('akademik.master');
-    Route::post('/akademik/master/mata-kuliah',[App\Http\Controllers\Private\Dosen\AkademikController::class, 'storeMataKuliah'])->name('akademik.mata-kuliah.store');
-    Route::patch('/akademik/master/mata-kuliah/{code}',[App\Http\Controllers\Private\Dosen\AkademikController::class, 'updateMataKuliah'])->name('akademik.mata-kuliah.update');
-    Route::delete('/akademik/master/mata-kuliah/{code}',[App\Http\Controllers\Private\Dosen\AkademikController::class, 'deleteMataKuliah'])->name('akademik.mata-kuliah.delete');
+    // Dosen memiliki hak penuh Master Akademik dengan controller Master yang sama seperti Admin.
+    require __DIR__.'/master-akademik.php';
 
+    // Operasional akademik khusus Dosen.
     Route::get('/akademik/jadwal',[App\Http\Controllers\Private\Dosen\AkademikOperasionalController::class, 'jadwal'])->name('akademik.jadwal');
     Route::post('/akademik/jadwal',[App\Http\Controllers\Private\Dosen\AkademikOperasionalController::class, 'simpanJadwal'])->name('akademik.jadwal.store');
     Route::patch('/akademik/jadwal/{code}',[App\Http\Controllers\Private\Dosen\AkademikOperasionalController::class, 'updateJadwal'])->name('akademik.jadwal.update');
