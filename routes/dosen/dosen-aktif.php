@@ -8,7 +8,7 @@ Route::group(['prefix' => 'dosen', 'middleware' => ['checkUser:Dosen Aktif', 'do
     Route::get('/profile',[App\Http\Controllers\Private\Dosen\RootController::class, 'renderProfile'])->name('profile-render');
     Route::patch('/profile',[App\Http\Controllers\Private\Dosen\RootController::class, 'handleProfile'])->name('profile-handle');
 
-    // Dosen memiliki hak penuh Master Akademik dengan controller Master yang sama seperti Admin.
+    // Master Akademik Dosen: hak penuh dan controller yang sama dengan Admin.
     require __DIR__.'/master-akademik.php';
 
     // Operasional akademik khusus Dosen.
