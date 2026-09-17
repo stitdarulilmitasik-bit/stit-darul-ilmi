@@ -46,10 +46,22 @@
 
                 <h3 class="mt-4 mb-3">Status Akademik</h3>
                 <div class="row g-3">
-                    <div class="col-md-4"><label class="form-label">Jenjang</label><input class="form-control" name="jenjang" value="{{ old('jenjang', $user->programStudi->jenjang ?? '') }}" required></div>
+                    <div class="col-md-4">
+                        <label class="form-label">Jenjang</label>
+                        <select class="form-select" name="jenjang" required>
+                            <option value="S1" @selected(old('jenjang','S1')==='S1')>S1</option>
+                            <option value="S2" @selected(old('jenjang')==='S2')>S2</option>
+                            <option value="S3" @selected(old('jenjang')==='S3')>S3</option>
+                        </select>
+                        <div class="form-hint">Saat ini STIT Darul Ilmi membuka program S1. S2 dan S3 disiapkan untuk pengembangan berikutnya.</div>
+                    </div>
                     <div class="col-md-8"><label class="form-label">Program Studi</label><input class="form-control" name="program_studi" value="{{ old('program_studi', $user->programStudi->name ?? '') }}" required></div>
                     <div class="col-md-4"><label class="form-label">Memulai Studi</label><select class="form-select" name="periode_mulai" required><option value="Ganjil" @selected(old('periode_mulai','Ganjil')==='Ganjil')>Ganjil</option><option value="Genap" @selected(old('periode_mulai')==='Genap')>Genap</option></select></div>
-                    <div class="col-md-4"><label class="form-label">Tahun Akademik</label><input class="form-control" name="tahun_akademik" value="{{ old('tahun_akademik', optional($user->tahunAkademikRegistrasi)->name ?? '') }}" placeholder="Contoh: 2026/2027" required></div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tahun Akademik</label>
+                        <input id="tahun_akademik" class="form-control" name="tahun_akademik" value="{{ old('tahun_akademik') }}" placeholder="Otomatis berdasarkan NIM" readonly required>
+                        <div class="form-hint">Diisi otomatis berdasarkan 2 digit awal NIM.</div>
+                    </div>
                     <div class="col-md-4"><label class="form-label">Keperluan</label><input class="form-control" name="keperluan" value="{{ old('keperluan') }}" placeholder="Contoh: Beasiswa" required></div>
                 </div>
             </div>
@@ -68,6 +80,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const jabatan = document.getElementById('pejabat_jabatan');
     const nama = document.getElementById('pejabat_nama');
     const nip = document.getElementById('pejabat_nip');
+    const tahunAkademik = document.getElementById('tahun_akademik');
+    const nim = @json((string) $user->numb_nim);
 
     function isiPenandaTangan() {
         const option = jabatan.options[jabatan.selectedIndex];
@@ -75,8 +89,19 @@ document.addEventListener('DOMContentLoaded', function () {
         nip.value = option?.dataset?.nip || '';
     }
 
+    function isiTahunAkademik() {
+        const match = nim.match(/^(\d{2})/);
+        if (!match) {
+            tahunAkademik.value = '';
+            return;
+        }
+        const tahunMulai = 2000 + Number(match[1]);
+        tahunAkademik.value = `${tahunMulai}/${tahunMulai + 1}`;
+    }
+
     jabatan.addEventListener('change', isiPenandaTangan);
     isiPenandaTangan();
+    isiTahunAkademik();
 });
 </script>
 @endsection
