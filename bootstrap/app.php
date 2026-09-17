@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'is-active' => App\Http\Middleware\isActive::class,
             'auth' => App\Http\Middleware\Authenticate::class,
             'guest' => App\Http\Middleware\RedirectIfAuthenticated::class,
+            'dosen.guard' => App\Http\Middleware\UseDosenGuard::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
