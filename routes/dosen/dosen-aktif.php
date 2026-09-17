@@ -7,6 +7,7 @@ Route::group(['prefix' => 'dosen', 'middleware' => ['checkUser:Dosen Aktif', 'do
     Route::get('/home',[App\Http\Controllers\Private\Dosen\RootController::class, 'renderDashboard'])->name('dashboard-render');
     Route::get('/profile',[App\Http\Controllers\Private\Dosen\RootController::class, 'renderProfile'])->name('profile-render');
     Route::patch('/profile',[App\Http\Controllers\Private\Dosen\RootController::class, 'handleProfile'])->name('profile-handle');
+    Route::get('/akademik/jadwal/export-pdf',[App\Http\Controllers\Private\Dosen\RootController::class, 'exportJadwalPdf'])->name('akademik.jadwal.export-pdf');
 
     // Master Akademik Dosen: hak penuh dan controller yang sama dengan Admin.
     require __DIR__.'/master-akademik.php';
