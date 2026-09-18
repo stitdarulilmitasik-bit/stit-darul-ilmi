@@ -102,6 +102,30 @@
             margin-top: 1rem;
         }
 
+        /* Mata Kuliah action buttons */
+        .matakuliah-header {
+            display: block !important;
+        }
+
+        .matakuliah-action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .matakuliah-action-btn {
+            min-width: 140px;
+            height: 38px;
+            padding: 0.5rem 0.75rem !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            flex: 0 0 auto;
+        }
+
         /* Responsive styling */
         @media screen and (max-width: 768px) {
             .table td[data-label] .d-flex.align-items-center,
@@ -155,11 +179,50 @@
         <!-- Main Content -->
         <div class="col-lg-8 col-12 mb-2">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header matakuliah-header">
                     <h5 class="mb-0">{{ $pages }}</h5>
-                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
-                        <i class="fas fa-plus-circle me-2"></i>Tambah Mata Kuliah
-                    </button>
+                    <div class="matakuliah-action-row">
+                        <a href="{{ route($spref . 'akademik.mata-kuliah-export-excel') }}" class="btn btn-success matakuliah-action-btn">
+                            <i class="fas fa-file-excel me-2"></i>Export Excel
+                        </a>
+                        <a href="{{ route($spref . 'akademik.mata-kuliah-export-full-excel') }}" class="btn btn-dark matakuliah-action-btn">
+                            <i class="fas fa-database me-2"></i>Export Full Excel
+                        </a>
+                        <button class="btn btn-warning matakuliah-action-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseImportMataKuliah" aria-expanded="false" aria-controls="collapseImportMataKuliah">
+                            <i class="fas fa-file-import me-2"></i>Import Excel
+                        </button>
+                        <button class="btn btn-primary matakuliah-action-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
+                            <i class="fas fa-plus-circle me-2"></i>Tambah Mata Kuliah
+                        </button>
+                    </div>
+                </div>
+                <div class="collapse" id="collapseImportMataKuliah">
+                    <div class="card card-body border m-3">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                            <h5 class="card-title mb-0">Import Data Mata Kuliah</h5>
+                            <a href="{{ route($spref . 'akademik.mata-kuliah-import-template') }}" class="btn btn-outline-success">
+                                <i class="fas fa-download me-1"></i>Download Template
+                            </a>
+                        </div>
+                        <form action="{{ route($spref . 'akademik.mata-kuliah-import-excel') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row align-items-end">
+                                <div class="col-md-9 mb-3">
+                                    <label for="import_mata_kuliah_file" class="form-label">File Excel/CSV</label>
+                                    <input type="file" class="form-control" name="file" id="import_mata_kuliah_file" accept=".xlsx,.xls,.csv" required>
+                                    <small class="text-muted">Format .xlsx, .xls, atau .csv, maksimal 10 MB.</small>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fas fa-upload me-1"></i>Mulai Import
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="alert alert-light-info mb-0">
+                            <small>Gunakan template agar nama kolom sesuai database. Data yang memiliki <strong>code</strong> sama akan diperbarui, sedangkan code baru akan dibuat sebagai mata kuliah baru.</small>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <!-- Quick Stats -->
