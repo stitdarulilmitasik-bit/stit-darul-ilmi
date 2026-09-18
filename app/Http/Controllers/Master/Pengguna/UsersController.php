@@ -20,7 +20,7 @@ class UsersController extends Controller
 {
     public function renderUsers()
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
         $data['webs'] = WebSetting::first();
         $data['spref'] = $user ? $user->prefix : '';
         $data['menus'] = "Master";
@@ -53,7 +53,7 @@ class UsersController extends Controller
 
     public function viewUsers($code)
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
         $data['webs'] = WebSetting::first();
         $data['spref'] = $user ? $user->prefix : '';
         $data['menus'] = "Master";
@@ -177,11 +177,11 @@ class UsersController extends Controller
                 $updateData['domicile_poscode'] = $request->ktp_poscode;
             }
 
-            $updateData['updated_by'] = Auth::id();
+            $updateData['updated_by'] = Auth::guard('web')->id();
             $user->update($updateData);
 
             DB::commit();
-            $spref = Auth::user() ? Auth::user()->prefix : '';
+            $spref = Auth::guard('web')->user() ? Auth::guard('web')->user()->prefix : '';
             return redirect()->route($spref . 'pengguna.users-views', $code)->with('success', 'Profile berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -211,11 +211,11 @@ class UsersController extends Controller
                 'password' => Hash::make($request->password),
                 'code' => $code,
                 'type' => $request->type,
-                'created_by' => Auth::id()
+                'created_by' => Auth::guard('web')->id()
             ]);
 
             DB::commit();
-            $spref = Auth::user() ? Auth::user()->prefix : '';
+            $spref = Auth::guard('web')->user() ? Auth::guard('web')->user()->prefix : '';
             return redirect()->route($spref . 'pengguna.users-render')->with('success', 'Pengguna berhasil ditambahkan');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -243,7 +243,7 @@ class UsersController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'type' => $request->type,
-                'updated_by' => Auth::id()
+                'updated_by' => Auth::guard('web')->id()
             ];
             
             if ($request->filled('password')) {
@@ -253,7 +253,7 @@ class UsersController extends Controller
             $user->update($updateData);
 
             DB::commit();
-            $spref = Auth::user() ? Auth::user()->prefix : '';
+            $spref = Auth::guard('web')->user() ? Auth::guard('web')->user()->prefix : '';
             return redirect()->route($spref . 'pengguna.users-render')->with('success', 'Data pengguna berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -269,12 +269,12 @@ class UsersController extends Controller
             $user = User::where('code', $code)->firstOrFail();
             
             // Prevent self-deletion
-            if ($user->id === Auth::id()) {
+            if ($user->id === Auth::guard('web')->id()) {
                 return redirect()->back()->with('error', 'Tidak dapat menghapus akun sendiri');
             }
 
             $user->update([
-                'deleted_by' => Auth::id()
+                'deleted_by' => Auth::guard('web')->id()
             ]);
             $user->delete();
 
