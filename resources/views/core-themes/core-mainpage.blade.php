@@ -87,6 +87,23 @@
                 transform: translateY(0);
             }
         }
+        /* Front page: ikuti tinggi konten aktual, bukan tinggi viewport. */
+        body.cms-front-page,
+        body.cms-front-page .page,
+        body.cms-front-page .page-wrapper,
+        body.cms-front-page .page-body {
+            min-height: 0 !important;
+            height: auto !important;
+        }
+
+        body.cms-front-page .page {
+            display: block !important;
+        }
+
+        body.cms-front-page .page-body > .container-xl {
+            padding-bottom: 0 !important;
+        }
+
         /* Rapikan struktur halaman setelah Theme Builder dihapus. */
         html,
         body {
@@ -178,7 +195,7 @@
     <!-- END CUSTOM FONT -->
 </head>
 
-<body>
+<body class="cms-front-page">
     <!-- BEGIN GLOBAL THEME SCRIPT -->
     <script>
         // Tetapkan tema front page secara konsisten: light + hijau.

@@ -44,7 +44,7 @@ return [
 
     'debug' => (bool) env('APP_DEBUG', false),
     
-    'version' => env('APP_VERSION', 'v2.0-beta 1'),
+    'version' => env('APP_VERSION', 'v1.0'),
 
     /*
     |--------------------------------------------------------------------------
