@@ -20,7 +20,7 @@ class RootController extends Controller
 {
     public function renderDashboard()
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
         $data['webs'] = WebSetting::first();
         $data['spref'] = $user ? $user->prefix : '';
         $data['menus'] = "Detail";
@@ -32,7 +32,7 @@ class RootController extends Controller
 
     public function renderProfile()
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
         $data['webs'] = WebSetting::first();
         $data['spref'] = $user ? $user->prefix : '';
         $data['menus'] = "Detail";
@@ -62,8 +62,8 @@ class RootController extends Controller
                 'bio_weight' => 'nullable|numeric',
 
                 // Contact Information
-                'email' => 'required|email|unique:users,email,' . Auth::id(),
-                'phone' => 'required|string|unique:users,phone,' . Auth::id(),
+                'email' => 'required|email|unique:users,email,' . Auth::guard('web')->id(),
+                'phone' => 'required|string|unique:users,phone,' . Auth::guard('web')->id(),
                 'link_ig' => 'nullable|url',
                 'link_fb' => 'nullable|url',
                 'link_in' => 'nullable|url',
@@ -118,7 +118,7 @@ class RootController extends Controller
                     ->withInput();
             }
 
-            $user = Auth::user();
+            $user = Auth::guard('web')->user();
             $data = $validator->validated();
 
             // Handle photo upload
