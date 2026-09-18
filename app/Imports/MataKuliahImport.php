@@ -4,56 +4,82 @@ namespace App\Imports;
 
 use App\Models\Akademik\MataKuliah;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Illuminate\Support\Collection;
 
 class MataKuliahImport implements ToCollection, WithHeadingRow
 {
-    protected array $columns;
-    protected array $ignored = ['id', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by', 'deleted_by'];
-
-    public function __construct()
-    {
-        $this->columns = array_values(array_diff(
-            Schema::getColumnListing('mata_kuliahs'),
-            $this->ignored
-        ));
-    }
+    protected array $ignored = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'created_by',
+        'updated_by',
+        'deleted_by',
+    ];
 
     public function collection(Collection $rows)
     {
+        $columns = array_values(array_diff(
+            Schema::getColumnListing('mata_kuliahs'),
+            $this->ignored
+        ));
+
         foreach ($rows as $row) {
-            $data = [];
+            $row = $row->toArray();
 
-            foreach ($this->columns as $column) {
-                $value = $row->get($column);
-
-                if ($value !== null && $value !== '') {
-                    $data[$column] = $value;
-                }
-            }
-
-            if (empty($data['name'])) {
+            if ($this->isEmptyRow($row)) {
                 continue;
             }
 
-            if (empty($data['code'])) {
-                $data['code'] = 'MK-' . Str::upper(Str::random(8));
+            $data = [];
+            foreach ($columns as $column) {
+                if (array_key_exists($column, $row)) {
+                    $data[$column] = $row[$column];
+                }
             }
 
-            $existing = MataKuliah::withTrashed()->where('code', $data['code'])->first();
+            $id = $data['id'] ?? null;
+            $code = $data['code'] ?? null;
+
+            $existing = null;
+
+            if (!empty($id)) {
+                $existing = MataKuliah::withTrashed()->find($id);
+            }
+
+            if (!$existing && !empty($code)) {
+                $existing = MataKuliah::withTrashed()->where('code', $code)->first();
+            }
+
+            unset($data['id']);
 
             if ($existing) {
-                if (method_exists($existing, 'trashed') && $existing->trashed()) {
+                if ($existing->trashed()) {
                     $existing->restore();
                 }
+
                 $existing->update($data);
             } else {
+                if (empty($data['code'])) {
+                    $data['code'] = 'MK-' . Str::upper(Str::random(8));
+                }
+
                 MataKuliah::create($data);
             }
         }
+    }
+
+    protected function isEmptyRow(array $row): bool
+    {
+        foreach ($row as $value) {
+            if ($value !== null && trim((string) $value) !== '') {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
