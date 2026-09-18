@@ -134,27 +134,15 @@ body.cms-front-page .page-body > .container-xl{
     justify-content:center;
 }
 .cms-hero-visual:before{
-    content:"";
-    position:absolute;
-    width:245px;height:245px;
-    border-radius:50%;
-    background:
-        radial-gradient(circle at 35% 30%,#d9f18e 0 12%,transparent 13%),
-        linear-gradient(145deg,#b5df3e,#63a91e);
-    box-shadow:inset -22px -25px 45px rgba(53,113,13,.18),0 18px 35px rgba(65,111,35,.16);
+    content:none;
 }
 .cms-hero-visual:after{
-    content:"";
-    position:absolute;
-    width:190px;height:55px;
-    right:15%;bottom:6px;
-    background:radial-gradient(ellipse,#6aa82d 0 45%,transparent 46%);
-    opacity:.7;
+    content:none;
 }
 .cms-hero-visual img{
     position:relative;
-    max-height:170px;
-    max-width:80%;
+    max-height:230px;
+    max-width:95%;
     object-fit:contain;
     filter:drop-shadow(0 18px 25px rgba(50,78,40,.16));
 }
