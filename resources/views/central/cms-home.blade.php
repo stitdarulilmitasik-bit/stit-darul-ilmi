@@ -95,10 +95,11 @@ body.cms-front-page .page-body > .container-xl{
     color:#3f6f18;
 }
 .cms-hero .hero-subtitle{
-    max-width:620px;
+    max-width:680px;
     color:#586554;
-    font-size:.95rem;
-    line-height:1.6;
+    font-size:1.12rem;
+    line-height:1.75;
+    font-weight:500;
 }
 .cms-actions{
     display:flex;
