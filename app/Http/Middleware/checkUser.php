@@ -46,6 +46,16 @@ class checkUser
 
         $user = Auth::guard($guard)->user();
 
+        // Hard isolation: satu request/role hanya boleh menyimpan satu guard aktif.
+        // Ini mencegah sesi Dosen/Mahasiswa lama ikut terbawa ketika membuka Admin,
+        // dan sebaliknya.
+        foreach (['web', 'dosen', 'mahasiswa'] as $otherGuard) {
+            if ($otherGuard !== $guard) {
+                Auth::guard($otherGuard)->logout();
+            }
+        }
+        Auth::shouldUse($guard);
+
         if (!$user || $user->type !== $userType) {
             return redirect()->route('error.access');
         }
