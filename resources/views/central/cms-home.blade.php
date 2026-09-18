@@ -29,12 +29,12 @@ body.cms-front-page .page-body > .container-xl{
     display:none;
 }
 .cms-hero-wrap{
-    padding:20px 20px 0;
+    padding:14px 20px 0;
 }
 .cms-hero{
     position:relative;
-    min-height:360px;
-    border-radius:28px;
+    min-height:300px;
+    border-radius:24px;
     overflow:hidden;
     background:
         radial-gradient(circle at 85% 20%,rgba(183,221,117,.5),transparent 32%),
@@ -76,8 +76,8 @@ body.cms-front-page .page-body > .container-xl{
 }
 .cms-hero h1{
     max-width:760px;
-    margin:14px 0 14px;
-    font-size:clamp(2.15rem,4.8vw,4rem);
+    margin:10px 0 10px;
+    font-size:clamp(1.9rem,4vw,3.2rem);
     line-height:1.02;
     letter-spacing:-.055em;
     font-weight:900;
@@ -85,14 +85,14 @@ body.cms-front-page .page-body > .container-xl{
 .cms-hero .hero-subtitle{
     max-width:650px;
     color:#52634e;
-    font-size:1rem;
+    font-size:.94rem;
     line-height:1.6;
 }
 .cms-actions{
     display:flex;
     flex-wrap:wrap;
     gap:12px;
-    margin-top:20px;
+    margin-top:14px;
 }
 .cms-btn-primary{
     background:var(--stit-green-dark);
@@ -116,7 +116,7 @@ body.cms-front-page .page-body > .container-xl{
     right:5%;
     bottom:0;
     width:43%;
-    height:72%;
+    height:68%;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -124,13 +124,13 @@ body.cms-front-page .page-body > .container-xl{
 .cms-hero-visual:before{
     content:"";
     position:absolute;
-    width:250px;height:250px;
+    width:210px;height:210px;
     border-radius:50%;
     background:rgba(143,188,85,.18);
 }
 .cms-hero-visual img{
     position:relative;
-    max-height:205px;
+    max-height:180px;
     max-width:90%;
     object-fit:contain;
     filter:drop-shadow(0 25px 35px rgba(50,78,40,.14));
@@ -358,7 +358,7 @@ body.cms-front-page .page-body > .container-xl{
 @media (max-width:575.98px){
     .cms-hero-wrap{padding:14px 10px 0}
     .cms-hero{border-radius:26px}
-    .cms-hero h1{font-size:2.2rem}
+    .cms-hero h1{font-size:2rem}
     .cms-section{padding-left:10px;padding-right:10px;padding-top:62px}
     .cms-section-head{display:block}
     .cms-section-head .btn{margin-top:15px}
