@@ -81,7 +81,10 @@
             @php
                 $semester = (int) ($item->semester ?? 0);
                 $periode = $semester > 0 ? ($semester % 2 === 0 ? 'Genap' : 'Ganjil') : null;
-                $angkatan = $item->tahunAkademikRegistrasi?->name;
+                $takaRegist = $item->taka_regist;
+                $angkatan = $takaRegist !== null && $takaRegist !== ''
+                    ? (strlen((string) $takaRegist) === 2 ? '20' . $takaRegist : $takaRegist)
+                    : null;
             @endphp
             <tr>
                 <td class="center">{{ $i + 1 }}</td>
