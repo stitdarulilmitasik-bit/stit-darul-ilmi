@@ -425,7 +425,7 @@ body.cms-front-page .page-body > .container-xl{
     <div class="cms-hero-wrap">
         <section class="cms-hero">
             <div class="container-xl cms-hero-inner">
-                <div class="row align-items-center h-100">
+                <div class="row align-items-center h-70">
                     <div class="col-lg-7 py-5">
                         <span class="cms-kicker">STIT Darul Ilmi Tasikmalaya</span>
                         <h1>{{ $hero?->title ?: $webs->school_name }}</h1>
