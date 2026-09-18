@@ -170,6 +170,10 @@ use Illuminate\Support\Facades\Route;
     // MASTER PENGGUNA => DOSEN
     Route::get('/pengguna/dosen',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'renderDosen'])->name('pengguna.dosen-render');
     Route::get('/pengguna/dosen/export/pdf',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'exportDosenPDF'])->name('pengguna.dosen-export-pdf');
+    Route::get('/pengguna/dosen/export/excel',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'exportDosenExcel'])->name('pengguna.dosen-export-excel');
+    Route::get('/pengguna/dosen/export/full-excel',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'exportDosenFullExcel'])->name('pengguna.dosen-export-full-excel');
+    Route::get('/pengguna/dosen/import/template',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'downloadDosenImportTemplate'])->name('pengguna.dosen-import-template');
+    Route::post('/pengguna/dosen/import/excel',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'importDosenExcel'])->name('pengguna.dosen-import-excel');
     Route::get('/pengguna/dosen/{code}/views',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'viewDosen'])->name('pengguna.dosen-views');
     Route::post('/pengguna/dosen',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'handleDosen'])->name('pengguna.dosen-handle');
     Route::patch('/pengguna/dosen/{code}',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'updateDosen'])->name('pengguna.dosen-update');
