@@ -19,7 +19,7 @@ class LogAktivitasController extends Controller
 {
     public function renderLogAktivitas()
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
         $data['webs'] = WebSetting::first();
         $data['spref'] = $user ? $user->prefix : '';
         $data['menus'] = "Master";
@@ -42,7 +42,7 @@ class LogAktivitasController extends Controller
 
     public function viewLogAktivitas($id)
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
         $data['webs'] = WebSetting::first();
         $data['spref'] = $user ? $user->prefix : '';
         $data['menus'] = "Master";
@@ -67,7 +67,7 @@ class LogAktivitasController extends Controller
     public function filterLogAktivitas(Request $request)
     {
         try {
-            $user = Auth::user();
+            $user = Auth::guard('web')->user();
             $data['webs'] = WebSetting::first();
             $data['spref'] = $user ? $user->prefix : '';
             $data['menus'] = "Master";
