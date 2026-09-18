@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use PDF;
 // Use Models
 use App\Models\Mahasiswa;
 use App\Models\Akademik\ProgramStudi;
@@ -26,10 +27,31 @@ class MahasiswaController extends Controller
         $data['menus'] = "Master";
         $data['pages'] = "Mahasiswa";
         $data['academy'] = $data['webs']->school_apps . ' by ' . $data['webs']->school_name;
-        $data['mahasiswa'] = Mahasiswa::all();
+        $data['mahasiswa'] = Mahasiswa::with('programStudi')->get();
         $data['prodi'] = ProgramStudi::all();
         
         return view('master.pengguna.mahasiswa-index', $data, compact('user'));
+    }
+
+    public function exportMahasiswaPDF()
+    {
+        try {
+            $mahasiswa = Mahasiswa::with(['programStudi.fakultas'])
+                ->orderBy('name')
+                ->get();
+
+            $data = [
+                'mahasiswa' => $mahasiswa,
+                'webs' => WebSetting::first(),
+            ];
+
+            $pdf = PDF::loadView('master.pengguna.mahasiswa-pdf', $data)
+                ->setPaper('a4', 'landscape');
+
+            return $pdf->download('daftar-mahasiswa-' . now()->format('Y-m-d') . '.pdf');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal export PDF mahasiswa: ' . $e->getMessage());
+        }
     }
 
     public function viewMahasiswa($code)
