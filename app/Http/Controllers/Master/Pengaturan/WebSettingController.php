@@ -23,6 +23,23 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class WebSettingController extends Controller
 {
+    /**
+     * Hanya Web Administrator (type 0) yang boleh mengubah Web Settings
+     * atau melakukan backup/restore database.
+     * Staff/Operator hanya memiliki akses view-only.
+     */
+    private function ensureAdministrator(): void
+    {
+        $currentUser = Auth::guard('web')->user();
+        $rawType = $currentUser?->getRawOriginal('type');
+
+        abort_unless(
+            $currentUser && (int) $rawType === 0,
+            403,
+            'Akses pengaturan web hanya untuk Administrator.'
+        );
+    }
+
     public function renderIndex()
     {
         $user = Auth::user();
@@ -37,6 +54,7 @@ class WebSettingController extends Controller
 
     public function handleSettings(Request $request)
     {
+        $this->ensureAdministrator();
         try {
             // Validate the request
             $validator = Validator::make($request->all(), [
@@ -167,6 +185,7 @@ class WebSettingController extends Controller
 
     public function exportDatabase()
     {
+        $this->ensureAdministrator();
         try {
             // Get database configuration
             $host = env('DB_HOST');
@@ -262,6 +281,7 @@ class WebSettingController extends Controller
 
     public function importDatabase(Request $request)
     {
+        $this->ensureAdministrator();
         try {
             // More permissive validation
             $request->validate([
