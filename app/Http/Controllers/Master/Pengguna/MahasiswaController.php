@@ -21,7 +21,7 @@ class MahasiswaController extends Controller
 {
     public function renderMahasiswa()
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
         $data['webs'] = WebSetting::first();
         $data['spref'] = $user ? $user->prefix : '';
         $data['menus'] = "Master";
@@ -56,7 +56,7 @@ class MahasiswaController extends Controller
 
     public function viewMahasiswa($code)
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
         $data['webs'] = WebSetting::first();
         $data['spref'] = $user ? $user->prefix : '';
         $data['menus'] = "Master";
@@ -199,11 +199,11 @@ class MahasiswaController extends Controller
                 $updateData['domicile_poscode'] = $request->ktp_poscode;
             }
 
-            $updateData['updated_by'] = Auth::id();
+            $updateData['updated_by'] = Auth::guard('web')->id();
             $mahasiswa->update($updateData);
 
             DB::commit();
-            $spref = Auth::user() ? Auth::user()->prefix : '';
+            $spref = Auth::guard('web')->user() ? Auth::guard('web')->user()->prefix : '';
             return redirect()->route($spref . 'pengguna.mahasiswa-views', $code)->with('success', 'Profile berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -239,11 +239,11 @@ class MahasiswaController extends Controller
                 'prodi_id' => $request->prodi_id,
                 'type' => $request->type,
                 'semester' => $request->semester,
-                'created_by' => Auth::id()
+                'created_by' => Auth::guard('web')->id()
             ]);
 
             DB::commit();
-            $spref = Auth::user() ? Auth::user()->prefix : '';
+            $spref = Auth::guard('web')->user() ? Auth::guard('web')->user()->prefix : '';
             return redirect()->route($spref . 'pengguna.mahasiswa-render')->with('success', 'Mahasiswa berhasil ditambahkan');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -277,7 +277,7 @@ class MahasiswaController extends Controller
                 'prodi_id' => $request->prodi_id,
                 'type' => $request->type,
                 'semester' => $request->semester,
-                'updated_by' => Auth::id()
+                'updated_by' => Auth::guard('web')->id()
             ];
             
             if ($request->filled('password')) {
@@ -287,7 +287,7 @@ class MahasiswaController extends Controller
             $mahasiswa->update($updateData);
 
             DB::commit();
-            $spref = Auth::user() ? Auth::user()->prefix : '';
+            $spref = Auth::guard('web')->user() ? Auth::guard('web')->user()->prefix : '';
             return redirect()->route($spref . 'pengguna.mahasiswa-render')->with('success', 'Data mahasiswa berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -303,12 +303,12 @@ class MahasiswaController extends Controller
             $mahasiswa = Mahasiswa::where('code', $code)->firstOrFail();
             
             // Prevent self-deletion
-            if ($mahasiswa->id === Auth::id()) {
+            if ($mahasiswa->id === Auth::guard('web')->id()) {
                 return redirect()->back()->with('error', 'Tidak dapat menghapus akun sendiri');
             }
 
             $mahasiswa->update([
-                'deleted_by' => Auth::id()
+                'deleted_by' => Auth::guard('web')->id()
             ]);
             $mahasiswa->delete();
 
