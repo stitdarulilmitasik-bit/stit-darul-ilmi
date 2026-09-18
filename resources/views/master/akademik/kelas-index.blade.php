@@ -151,20 +151,20 @@
 @endsection
 
 @section('content')
-    <div class="row">
+    <div class="kelas-page"><div class="row g-4 align-items-start">
         <!-- Main Content -->
         <div class="col-lg-8 col-12 mb-2">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">{{ $pages }}</h5>
+                <div class="card-header d-flex justify-content-between align-items-center gap-3">
+                    <div><div class="page-title"><i class="fas fa-chalkboard-teacher me-2 text-primary"></i>{{ $pages }}</div><div class="page-subtitle">Kelola data kelas dan kapasitas mahasiswa</div></div>
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
                         <i class="fas fa-plus-circle me-2"></i>Tambah Kelas
                     </button>
                 </div>
                 <div class="card-body">
                     <!-- Quick Stats -->
-                    <div class="row mb-4">
-                        <div class="col-md-4 mb-2">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
                             <div class="p-3 bg-light-primary rounded">
                                 <h6 class="mb-2">Total Kelas</h6>
                                 <h3 class="mb-0">{{ count($kelas) }}</h3>
@@ -263,7 +263,7 @@
                         </div>
                     </div>
                     
-                   <!-- Table --> <div class="table-responsive mt-3"> <table class="table"> <thead> <tr> <th class="text-center">No</th> <th>Nama Kelas</th> <th>Kode</th> <th>Program Studi</th> <th>Tahun Akademik</th> <th>Jenis Kelas</th> <th>Kapasitas</th> <th class="text-center">Aksi</th> </tr> </thead> <tbody> @foreach ($kelas as $key => $item) <tr> {{-- 1. No --}} <td data-label="No" class="text-center"> {{ $key + 1 }} </td> {{-- 2. Nama Kelas --}} <td data-label="Nama Kelas"> <span class="fw-bold"> {{ $item->name }} </span> </td> {{-- 3. Kode --}} <td data-label="Kode"> {{ $item->code }} </td> {{-- 4. Program Studi --}} <td data-label="Program Studi"> {{ $item->programStudi?->name ?? 'Program Studi belum ditentukan' }} </td> {{-- 5. Tahun Akademik --}} <td data-label="Tahun Akademik"> {{ $item->tahunAkademik?->name ?? '-' }} </td> {{-- 6. Jenis Kelas --}} <td data-label="Jenis Kelas"> {{ $item->jenisKelas?->name ?? '-' }} </td> {{-- 7. Kapasitas --}} <td data-label="Kapasitas"> {{ $item->anggota?->count() ?? 0 }} / {{ $item->capacity ?? 0 }} </td> {{-- 8. Aksi --}} <td data-label="Aksi" class="text-center"> <div class="btn-group" role="group"> <a href="#" data-bs-toggle="modal" data-bs-target="#editData{{ $item->code }}" class="btn btn-sm btn-primary" title="Edit Kelas"> <i class="fas fa-edit"></i> </a> <form action="{{ route($spref . 'akademik.kelas-delete', $item->code) }}" method="POST" class="d-inline" id="delete-form-{{ $item->code }}"> @csrf @method('DELETE') <button type="button" class="btn btn-sm btn-danger" title="Hapus Kelas" onclick="confirmDelete('{{ $item->code }}')"> <i class="fas fa-trash"></i> </button> </form> </div> </td> </tr> @endforeach </tbody> </table> </div>
+                   <!-- Table --> <div class="table-wrap mt-4"> <table class="table align-middle"> <thead> <tr> <th class="text-center">No</th> <th>Nama Kelas</th> <th>Kode</th> <th>Program Studi</th> <th>Tahun Akademik</th> <th>Jenis Kelas</th> <th>Kapasitas</th> <th class="text-center">Aksi</th> </tr> </thead> <tbody> @foreach ($kelas as $key => $item) <tr> {{-- 1. No --}} <td data-label="No" class="text-center"> {{ $key + 1 }} </td> {{-- 2. Nama Kelas --}} <td data-label="Nama Kelas"> <span class="class-name"> {{ $item->name }} </span> </td> {{-- 3. Kode --}} <td data-label="Kode"><span class="code-badge">{{ $item->code }}</span></td> {{-- 4. Program Studi --}} <td data-label="Program Studi"> {{ $item->programStudi?->name ?? 'Program Studi belum ditentukan' }} </td> {{-- 5. Tahun Akademik --}} <td data-label="Tahun Akademik"> {{ $item->tahunAkademik?->name ?? '-' }} </td> {{-- 6. Jenis Kelas --}} <td data-label="Jenis Kelas"> {{ $item->jenisKelas?->name ?? '-' }} </td> {{-- 7. Kapasitas --}} <td data-label="Kapasitas"> {{ $item->anggota?->count() ?? 0 }} / {{ $item->capacity ?? 0 }} </td> {{-- 8. Aksi --}} <td data-label="Aksi" class="text-center"> <div class="btn-group action-group" role="group"> <a href="#" data-bs-toggle="modal" data-bs-target="#editData{{ $item->code }}" class="btn btn-sm btn-primary" title="Edit Kelas"> <i class="fas fa-edit"></i> </a> <form action="{{ route($spref . 'akademik.kelas-delete', $item->code) }}" method="POST" class="d-inline" id="delete-form-{{ $item->code }}"> @csrf @method('DELETE') <button type="button" class="btn btn-sm btn-danger" title="Hapus Kelas" onclick="confirmDelete('{{ $item->code }}')"> <i class="fas fa-trash"></i> </button> </form> </div> </td> </tr> @endforeach </tbody> </table> </div>
                 </div>
             </div>
         </div>
@@ -291,12 +291,12 @@
                             <h6>Kelas Terbaru</h6>
                             <div class="list-group">
                                 @foreach($kelas->take(5) as $k)
-                                    <div class="list-group-item list-group-item-action">
+                                    <div class="list-group-item list-group-item-action recent-item">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <h6 class="mb-1">{{ $k->name }}</h6>
-                                            <small class="text-muted">{{ $k->jenisKelas->name }}</small>
+                                            <h6 class="mb-1 recent-name">{{ $k->name }}</h6>
+                                            <small class="recent-meta">{{ $k->jenisKelas?->name ?? '-' }}</small>
                                         </div>
-                                        <p class="mb-1">{{ $k->programStudi?->name ?? '-' }}</p>
+                                        <p class="mb-1 recent-meta">{{ $k->programStudi?->name ?? '-' }}</p>
                                         <small>Kapasitas: {{ $k->capacity }} mahasiswa</small>
                                     </div>
                                 @endforeach
