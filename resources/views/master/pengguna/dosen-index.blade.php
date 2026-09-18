@@ -313,14 +313,14 @@
                         <div class="mt-4">
                             <h6>Pengguna Terbaru</h6>
                             <div class="list-group">
-                                @foreach($dosen->sortByDesc('created_at')->take(3) as $user)
+                                @foreach($dosen->sortByDesc('created_at')->take(3) as $dosenItem)
                                     <div class="list-group-item list-group-item-action">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <h6 class="mb-1">{{ $user->name }}</h6>
-                                            <small class="text-muted">{{ $user->created_at->diffForHumans() }}</small>
+                                            <h6 class="mb-1">{{ $dosenItem->name }}</h6>
+                                            <small class="text-muted">{{ $dosenItem->created_at->diffForHumans() }}</small>
                                         </div>
-                                        <p class="mb-1">{{ $user->email }}</p>
-                                        <small class="text-muted">{{ $user->phone }}</small>
+                                        <p class="mb-1">{{ $dosenItem->email }}</p>
+                                        <small class="text-muted">{{ $dosenItem->phone }}</small>
                                     </div>
                                 @endforeach
                             </div>
