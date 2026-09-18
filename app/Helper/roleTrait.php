@@ -6,7 +6,9 @@ trait roleTrait
 {
     private function setPrefix()
     {
-        $rawType = auth()->user()->raw_type;
+        $user = \Illuminate\Support\Facades\Auth::guard('web')->user();
+        $rawType = $user?->raw_type;
+
         switch ($rawType) {
             case 1:
                 return 'finance.';
