@@ -82,6 +82,10 @@ class UsersController extends Controller
 
     public function handleProfile(Request $request, $code)
     {
+        // Profil pengguna pada menu Master hanya dapat diubah Administrator.
+        // Staff/Operator memiliki akses baca saja.
+        $this->ensureAdministrator();
+
         try {
             DB::beginTransaction();
             
