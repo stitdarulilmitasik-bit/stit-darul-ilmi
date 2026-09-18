@@ -160,6 +160,9 @@
                         <a href="{{ route($spref . 'pengguna.mahasiswa-export-pdf') }}" class="btn btn-danger btn-sm" target="_blank">
                             <i class="fas fa-file-pdf me-1"></i> Export PDF
                         </a>
+                        <a href="{{ route($spref . 'pengguna.mahasiswa-export-excel') }}" class="btn btn-success btn-sm">
+                            <i class="fas fa-file-excel me-1"></i> Export Excel
+                        </a>
                     </div>
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
                         <i class="fas fa-plus-circle me-2"></i>Tambah Mahasiswa
