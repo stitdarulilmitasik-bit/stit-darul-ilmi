@@ -356,7 +356,7 @@ body.cms-front-page .page-body > .container-xl{
     .cms-about{padding:28px}
 }
 @media (max-width:575.98px){
-    .cms-hero-wrap{padding:14px 10px 0}
+    .cms-hero-wrap{padding:8px 10px 0}
     .cms-hero{border-radius:26px}
     .cms-hero h1{font-size:2rem}
     .cms-section{padding-left:10px;padding-right:10px;padding-top:62px}
