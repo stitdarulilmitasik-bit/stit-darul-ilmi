@@ -356,9 +356,9 @@
                                     <th>NIM</th>
                                     <th>Program Studi</th>
                                     <th>Nomor Telepon</th>
-                                    <th>Semester</th>
+                                    <th>Alamat</th>
                                     <th>Status</th>
-                                    <th>Semester / Periode</th>
+                                    <th>Angkatan</th>
                                     <th class="text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -379,33 +379,20 @@
                                         <td data-label="NIM">{{ $item->numb_nim ?? '-' }}</td>
                                         <td data-label="Program Studi">{{ $item->programStudi->name ?? '-' }}</td>
                                         <td data-label="Nomor Telepon">{{ $item->phone ?? '-' }}</td>
-                                        <td data-label="Semester">{{ $item->semester }}</td>
+                                        <td data-label="Alamat">{{ $item->ktp_village ?? '-' }}</td>
                                         <td data-label="Status">
                                             <span class="badge {{ $item->raw_type == 1 ? 'bg-light-success text-success' : ($item->raw_type == 0 ? 'bg-light-info text-info' : ($item->raw_type == 4 ? 'bg-light-warning text-warning' : ($item->raw_type == 2 ? 'bg-light-warning text-warning' : 'bg-light-secondary text-secondary'))) }}">
                                                 {{ $item->type }}
                                             </span>
                                         </td>
-                                        <td data-label="Semester / Periode">
+                                        <td data-label="Angkatan">
                                             @php
-                                                $semester = (int) ($item->semester ?? 0);
-                                                $periode = $semester > 0 ? ($semester % 2 === 0 ? 'Genap' : 'Ganjil') : null;
                                                 $takaRegist = $item->taka_regist;
                                                 $angkatan = $takaRegist !== null && $takaRegist !== ''
                                                     ? (strlen((string) $takaRegist) === 2 ? '20' . $takaRegist : $takaRegist)
                                                     : null;
                                             @endphp
-                                            <div class="d-flex flex-column gap-1">
-                                                @if ($semester > 0)
-                                                    <span class="badge bg-light-primary text-primary align-self-start">
-                                                        <i class="fas fa-layer-group me-1"></i>Semester {{ $semester }}{{ $periode ? ' · ' . $periode : '' }}
-                                                    </span>
-                                                @else
-                                                    <span class="text-muted">Belum ada semester</span>
-                                                @endif
-                                                @if ($angkatan)
-                                                    <small class="text-muted"><i class="fas fa-graduation-cap me-1"></i>Angkatan {{ $angkatan }}</small>
-                                                @endif
-                                            </div>
+                                            {{ $angkatan ?? '-' }}
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">

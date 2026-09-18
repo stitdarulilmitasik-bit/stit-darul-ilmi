@@ -72,15 +72,13 @@
 
 <table class="data">
     <thead><tr>
-        <th style="width:5%">No</th><th style="width:25%">Nama</th><th style="width:13%">NIM</th>
-        <th style="width:22%">Program Studi</th><th style="width:12%">Semester / Periode</th>
-        <th style="width:13%">Status</th><th style="width:15%">Angkatan</th>
+        <th style="width:4%">No</th><th style="width:23%">Nama</th><th style="width:12%">NIM</th>
+        <th style="width:19%">Program Studi</th><th style="width:20%">Alamat</th>
+        <th style="width:11%">Status</th><th style="width:11%">Angkatan</th>
     </tr></thead>
     <tbody>
         @forelse($mahasiswa as $i => $item)
             @php
-                $semester = (int) ($item->semester ?? 0);
-                $periode = $semester > 0 ? ($semester % 2 === 0 ? 'Genap' : 'Ganjil') : null;
                 $takaRegist = $item->taka_regist;
                 $angkatan = $takaRegist !== null && $takaRegist !== ''
                     ? (strlen((string) $takaRegist) === 2 ? '20' . $takaRegist : $takaRegist)
@@ -89,12 +87,15 @@
             <tr>
                 <td class="center">{{ $i + 1 }}</td>
                 <td><strong>{{ $item->name ?? '-' }}</strong>@if($item->email)<br><small>{{ $item->email }}</small>@endif</td>
-                <td>{{ $item->numb_nim ?? '-' }}</td><td>{{ $item->programStudi->name ?? '-' }}</td>
-                <td class="center">@if($semester > 0)Semester {{ $semester }}{{ $periode ? ' · ' . $periode : '' }}@else-@endif</td>
+                <td>{{ $item->numb_nim ?? '-' }}</td>
+                <td>{{ $item->programStudi->name ?? '-' }}</td>
+                <td>{{ $item->ktp_village ?? '-' }}</td>
                 <td class="center status">{{ $item->type ?? '-' }}</td>
                 <td class="center">{{ $angkatan ? 'Angkatan ' . $angkatan : '-' }}</td>
             </tr>
-        @empty<tr><td colspan="7" style="text-align:center;padding:12px;">Tidak ada data mahasiswa.</td></tr>@endforelse
+        @empty
+            <tr><td colspan="7" style="text-align:center;padding:12px;">Tidak ada data mahasiswa.</td></tr>
+        @endforelse
     </tbody>
 </table>
 
