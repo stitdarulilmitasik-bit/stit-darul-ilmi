@@ -45,6 +45,9 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
         ];
 
         foreach ($rows as $index => $row) {
+            // ToCollection mengirim setiap baris sebagai Illuminate\\Support\\Collection.
+            // Ubah menjadi array agar akses $row['kolom'] dan array_key_exists() aman.
+            $row = $row->toArray();
             $excelRow = $index + 2;
 
             $name = trim((string) ($row['name'] ?? $row['nama'] ?? ''));
