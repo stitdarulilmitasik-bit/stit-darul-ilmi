@@ -163,6 +163,9 @@
                         <a href="{{ route($spref . 'pengguna.mahasiswa-export-excel') }}" class="btn btn-success btn-sm">
                             <i class="fas fa-file-excel me-1"></i> Export Excel
                         </a>
+                        <a href="{{ route($spref . 'pengguna.mahasiswa-export-full-excel') }}" class="btn btn-dark btn-sm" title="Export seluruh isi tabel mahasiswas">
+                            <i class="fas fa-database me-1"></i> Export Full Excel
+                        </a>
                         <button class="btn btn-warning btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseImportMahasiswa" aria-expanded="false" aria-controls="collapseImportMahasiswa">
                             <i class="fas fa-file-import me-1"></i> Import Excel
                         </button>
