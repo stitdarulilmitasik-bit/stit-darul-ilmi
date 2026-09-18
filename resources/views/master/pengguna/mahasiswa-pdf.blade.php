@@ -71,17 +71,11 @@
 </div>
 
 <table class="data">
-    <thead>
-        <tr>
-            <th style="width:5%">No</th>
-            <th style="width:25%">Nama</th>
-            <th style="width:13%">NIM</th>
-            <th style="width:22%">Program Studi</th>
-            <th style="width:9%">Semester</th>
-            <th style="width:13%">Status</th>
-            <th style="width:20%">Keterangan Akademik</th>
-        </tr>
-    </thead>
+    <thead><tr>
+        <th style="width:5%">No</th><th style="width:25%">Nama</th><th style="width:13%">NIM</th>
+        <th style="width:22%">Program Studi</th><th style="width:12%">Semester / Periode</th>
+        <th style="width:13%">Status</th><th style="width:15%">Angkatan</th>
+    </tr></thead>
     <tbody>
         @forelse($mahasiswa as $i => $item)
             @php
@@ -91,32 +85,13 @@
             @endphp
             <tr>
                 <td class="center">{{ $i + 1 }}</td>
-                <td>
-                    <strong>{{ $item->name ?? '-' }}</strong>
-                    @if($item->email)
-                        <br><small>{{ $item->email }}</small>
-                    @endif
-                </td>
-                <td>{{ $item->numb_nim ?? '-' }}</td>
-                <td>{{ $item->programStudi->name ?? '-' }}</td>
-                <td class="center">{{ $semester > 0 ? $semester : '-' }}</td>
+                <td><strong>{{ $item->name ?? '-' }}</strong>@if($item->email)<br><small>{{ $item->email }}</small>@endif</td>
+                <td>{{ $item->numb_nim ?? '-' }}</td><td>{{ $item->programStudi->name ?? '-' }}</td>
+                <td class="center">@if($semester > 0)Semester {{ $semester }}{{ $periode ? ' · ' . $periode : '' }}@else-@endif</td>
                 <td class="center status">{{ $item->type ?? '-' }}</td>
-                <td>
-                    @if ($item->raw_type == 4)
-                        <strong>Cuti</strong>
-                    @elseif ($periode)
-                        {{ $periode }} · Semester {{ $semester }}
-                    @else
-                        Belum ada semester
-                    @endif
-                    @if ($angkatan)
-                        <br><small>Angkatan {{ $angkatan }}</small>
-                    @endif
-                </td>
+                <td class="center">{{ $angkatan ? 'Angkatan ' . $angkatan : '-' }}</td>
             </tr>
-        @empty
-            <tr><td colspan="7" style="text-align:center;padding:12px;">Tidak ada data mahasiswa.</td></tr>
-        @endforelse
+        @empty<tr><td colspan="7" style="text-align:center;padding:12px;">Tidak ada data mahasiswa.</td></tr>@endforelse
     </tbody>
 </table>
 
