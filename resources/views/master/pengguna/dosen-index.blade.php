@@ -44,6 +44,30 @@
             padding: 1.5rem;
         }
 
+        /* Dosen action buttons */
+        .dosen-header {
+            display: block !important;
+        }
+
+        .dosen-action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .dosen-action-btn {
+            min-width: 140px;
+            height: 38px;
+            padding: 0.5rem 0.75rem !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            flex: 0 0 auto;
+        }
+
         /* Table styling */
         .table {
             margin-bottom: 0;
@@ -160,18 +184,64 @@
         <!-- Main Content -->
         <div class="col-lg-8 col-12 mb-2">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">{{ $pages }}</h5>
-                    <div class="d-flex gap-2">
-                        <a href="{{ route($spref . 'pengguna.dosen-export-pdf') }}" class="btn btn-danger">
+                <div class="card-header dosen-header">
+                    <div class="d-flex align-items-center">
+                        <h5 class="mb-0">{{ $pages }}</h5>
+                    </div>
+
+                    <div class="dosen-action-row">
+                        <a href="{{ route($spref . 'pengguna.dosen-export-pdf') }}" class="btn btn-danger dosen-action-btn" target="_blank">
                             <i class="fas fa-file-pdf me-1"></i> Export PDF
                         </a>
-                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
-                            <i class="fas fa-plus-circle me-2"></i>Tambah Pengguna
+                        <a href="{{ route($spref . 'pengguna.dosen-export-excel') }}" class="btn btn-success dosen-action-btn">
+                            <i class="fas fa-file-excel me-1"></i> Export Excel
+                        </a>
+                        <a href="{{ route($spref . 'pengguna.dosen-export-full-excel') }}" class="btn btn-dark dosen-action-btn" title="Export seluruh isi tabel dosens">
+                            <i class="fas fa-database me-1"></i> Export Full Excel
+                        </a>
+                        <button class="btn btn-warning dosen-action-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseImportDosen" aria-expanded="false" aria-controls="collapseImportDosen">
+                            <i class="fas fa-file-import me-1"></i> Import Excel
+                        </button>
+                        <button class="btn btn-primary dosen-action-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
+                            <i class="fas fa-plus-circle me-1"></i>Tambah Dosen
                         </button>
                     </div>
                 </div>
                 <div class="card-body">
+                    <div class="collapse mb-4" id="collapseImportDosen">
+                        <div class="card border border-warning">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h6 class="mb-1"><i class="fas fa-file-import me-2"></i>Import Data Dosen</h6>
+                                        <small class="text-muted">Gunakan template Excel agar nama kolom sesuai dengan database dosen.</small>
+                                    </div>
+                                    <a href="{{ route($spref . 'pengguna.dosen-import-template') }}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-download me-1"></i> Download Template
+                                    </a>
+                                </div>
+                                <form action="{{ route($spref . 'pengguna.dosen-import-excel') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="row align-items-end">
+                                        <div class="col-md-9 mb-2">
+                                            <label for="import_dosen_file" class="form-label">File Excel</label>
+                                            <input type="file" class="form-control" name="file" id="import_dosen_file" accept=".xlsx,.xls,.csv" required>
+                                            <small class="text-muted">Maksimal 10 MB. Format: XLSX, XLS, atau CSV.</small>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <button type="submit" class="btn btn-warning w-100">
+                                                <i class="fas fa-upload me-1"></i> Mulai Import
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="alert alert-info mt-3 mb-0">
+                                    <small><strong>Catatan:</strong> Data dicocokkan berdasarkan Code atau Email. Jika sudah ada, data akan diperbarui; jika belum ada, dosen baru dibuat.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Quick Stats -->
                     <div class="row mb-4">
                         <div class="col-md-6 mb-2">
