@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class MahasiswaExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithColumnFormatting
 {
+    private int $rowNumber = 0;
     public function query()
     {
         return Mahasiswa::query()
@@ -50,7 +51,7 @@ class MahasiswaExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
         }
 
         return [
-            $mahasiswa->id,
+            ++$this->rowNumber,
             $mahasiswa->name ?? '-',
             (string) ($mahasiswa->numb_nim ?? ''),
             $mahasiswa->programStudi->name ?? '-',
