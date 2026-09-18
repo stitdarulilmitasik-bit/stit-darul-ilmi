@@ -33,7 +33,7 @@ body.cms-front-page .page-body > .container-xl{
 }
 .cms-hero{
     position:relative;
-    min-height:560px;
+    min-height:420px;
     border-radius:36px;
     overflow:hidden;
     background:
@@ -51,7 +51,7 @@ body.cms-front-page .page-body > .container-xl{
     bottom:-120px;
 }
 .cms-hero-inner{
-    min-height:560px;
+    min-height:420px;
     position:relative;
     z-index:1;
 }
@@ -116,7 +116,7 @@ body.cms-front-page .page-body > .container-xl{
     right:5%;
     bottom:0;
     width:43%;
-    height:82%;
+    height:76%;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -124,13 +124,13 @@ body.cms-front-page .page-body > .container-xl{
 .cms-hero-visual:before{
     content:"";
     position:absolute;
-    width:390px;height:390px;
+    width:300px;height:300px;
     border-radius:50%;
     background:rgba(143,188,85,.18);
 }
 .cms-hero-visual img{
     position:relative;
-    max-height:300px;
+    max-height:240px;
     max-width:90%;
     object-fit:contain;
     filter:drop-shadow(0 25px 35px rgba(50,78,40,.14));
