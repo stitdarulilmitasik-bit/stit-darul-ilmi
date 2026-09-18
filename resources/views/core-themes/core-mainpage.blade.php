@@ -87,13 +87,64 @@
                 transform: translateY(0);
             }
         }
-        .navbar {
-            width: 100vw !important;
-            margin-left: calc((100vw - 100%) / -2);
-            margin-right: calc((100vw - 100%) / -2);
-            left: 0;
-            right: 0;
+        /* Rapikan struktur halaman setelah Theme Builder dihapus. */
+        html,
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 100%;
+        }
+
+        .page {
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 100vh;
+        }
+
+        .page-wrapper {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        .page-body {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        /* Navbar full width tanpa menyebabkan overflow/geser vertikal. */
+        .page > header.navbar,
+        .page > header.navbar-expand-md {
+            width: 100% !important;
+            margin: 0 !important;
+            left: auto !important;
+            right: auto !important;
             border-radius: 0 !important;
+        }
+
+        .page > header.navbar-expand-md .navbar {
+            width: 100% !important;
+            margin: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            border-radius: 0 !important;
+        }
+
+        .page > header.navbar-expand-md .navbar .container-xl {
+            min-height: 0;
+        }
+
+        /* Desktop: menu langsung tampil dan tidak menambah ruang kosong. */
+        @media (min-width: 768px) {
+            .page > header.navbar-expand-md .navbar-collapse {
+                display: block !important;
+                height: auto !important;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .page > header.navbar-expand-md .navbar {
+                min-height: 0;
+            }
         }
     </style>
 
@@ -409,7 +460,7 @@
     <!-- END DEMO SCRIPTS -->
     @yield('custom-js')
     <!-- BEGIN PAGE SCRIPTS -->
-    <!-- END PAGE SCRIPTS -->    <!-- BEGIN FLOATING CHAT BUTTON -->
+    <!-- END PAGE SCRIPTS -->\n\n    <!-- BEGIN FLOATING CHAT BUTTON -->
     <div class="chat-button" onclick="toggleChatPopup()">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-message" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
