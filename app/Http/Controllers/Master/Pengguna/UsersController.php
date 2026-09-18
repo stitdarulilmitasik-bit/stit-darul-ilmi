@@ -24,8 +24,11 @@ class UsersController extends Controller
      */
     private function ensureAdministrator(): void
     {
+        $currentUser = Auth::guard('web')->user();
+        $rawType = $currentUser?->getRawOriginal('type');
+
         abort_unless(
-            (int) Auth::guard('web')->user()?->type === 0,
+            $currentUser && (int) $rawType === 0,
             403,
             'Akses pengelolaan pengguna hanya untuk Administrator.'
         );
