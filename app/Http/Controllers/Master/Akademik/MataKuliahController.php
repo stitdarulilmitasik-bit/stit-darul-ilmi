@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\MataKuliahExport;
+use App\Exports\MataKuliahFullExport;
+use App\Exports\MataKuliahImportTemplate;
+use App\Imports\MataKuliahImport;
 // Use Models
 use App\Models\Akademik\MataKuliah;
 use App\Models\Akademik\Kurikulum;
@@ -31,6 +36,40 @@ class MataKuliahController extends Controller
         $data['dosens'] = Dosen::all();
         
         return view('master.akademik.mata-kuliah-index', $data, compact('user'));
+    }
+
+    public function exportMataKuliahExcel()
+    {
+        return Excel::download(new MataKuliahExport(), 'data-mata-kuliah-' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    public function exportMataKuliahFullExcel()
+    {
+        return Excel::download(new MataKuliahFullExport(), 'export-full-mata-kuliah-' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    public function downloadMataKuliahImportTemplate()
+    {
+        return Excel::download(new MataKuliahImportTemplate(), 'template-import-mata-kuliah.xlsx');
+    }
+
+    public function importMataKuliahExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            Excel::import(new MataKuliahImport(), $request->file('file'));
+            DB::commit();
+
+            return redirect()->route((Auth::user()->prefix ?? '') . 'akademik.mata-kuliah-render')
+                ->with('success', 'Data mata kuliah berhasil diimport.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Import mata kuliah gagal: ' . $e->getMessage());
+        }
     }
 
     public function handleMataKuliah(Request $request)
