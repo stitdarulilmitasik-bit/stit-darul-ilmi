@@ -415,7 +415,13 @@
                         <div class="card-footer bg-transparent mt-4">
                             <div class="btn-list justify-content-end">
                                 <button type="button" class="btn btn-1" onclick="window.history.back()">Cancel</button>
-                                <button type="submit" class="btn btn-primary btn-2">Save Changes</button>
+                                @if ((int) Auth::guard('web')->user()?->getRawOriginal('type') === 0)
+                                    <button type="submit" class="btn btn-primary btn-2">Save Changes</button>
+                                @else
+                                    <button type="button" class="btn btn-secondary btn-2" disabled title="Staff/Operator hanya dapat melihat data pengguna">
+                                        Save Changes
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     </form>
