@@ -29,6 +29,23 @@
     </style>
 </head>
 
+@php
+    /*
+     * Gunakan identitas dari guard yang memang memiliki prefix halaman.
+     * Ini mencegah variabel $user dari child view/loop menimpa identitas
+     * akun yang sedang login (misalnya Administrator berubah menjadi Staff/Operator).
+     */
+    $layoutUser = match (true) {
+        in_array($spref ?? '', ['web-admin.', 'akademik.', 'finance.', 'kemahasiswaan.', 'it.', 'library.', 'umum.', 'admisi.'], true)
+            => \Illuminate\Support\Facades\Auth::guard('web')->user(),
+        $spref === 'dosen.'
+            => \Illuminate\Support\Facades\Auth::guard('dosen')->user(),
+        $spref === 'mahasiswa.'
+            => \Illuminate\Support\Facades\Auth::guard('mahasiswa')->user(),
+        default => $user ?? null,
+    };
+@endphp
+
 <body class="layout-fluid" data-bs-theme="light">
 <div class="page">
     <aside class="navbar navbar-vertical navbar-expand-lg" data-bs-theme="dark">
@@ -44,7 +61,7 @@
             </div>
 
             <div class="collapse navbar-collapse" id="sidebar-menu">
-                @include('core-themes.components.navbar-menu')
+                @include('core-themes.components.navbar-menu', ['layoutUser' => $layoutUser])
             </div>
         </div>
     </aside>
@@ -58,14 +75,14 @@
             <div class="navbar-nav flex-row order-md-last">
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link d-flex lh-1 p-0 px-2" data-bs-toggle="dropdown" aria-label="Buka menu pengguna">
-                        <span class="avatar avatar-sm" style="background-image: url({{ $user == null ? '' : $user->photo }})"></span>
+                        <span class="avatar avatar-sm" style="background-image: url({{ $layoutUser == null ? '' : $layoutUser->photo }})"></span>
                         <div class="d-none d-xl-block ps-2">
-                            <div>{{ $user == null ? 'Pengguna' : $user->name }}</div>
-                            <div class="mt-1 small text-secondary">{{ $user == null ? '' : $user->type }}</div>
+                            <div>{{ $layoutUser == null ? 'Pengguna' : $layoutUser->name }}</div>
+                            <div class="mt-1 small text-secondary">{{ $layoutUser == null ? '' : $layoutUser->type }}</div>
                         </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                        @if($user)
+                        @if($layoutUser)
                             <a href="{{ route($spref . 'profile-render') }}" class="dropdown-item">Profil</a>
                             <div class="dropdown-divider"></div>
                             <a href="{{ route($spref . 'handle-logout') }}" class="dropdown-item">Keluar</a>
