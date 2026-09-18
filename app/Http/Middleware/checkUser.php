@@ -16,7 +16,10 @@ class checkUser
      */
     public function handle(Request $request, Closure $next, $userType): Response
     {
-        $guard = match ($userType) {
+        // "web" berarti seluruh akun pada tabel users. Hak akses menu tetap
+        // dapat dibatasi berdasarkan raw type di level aplikasi.
+        $isWebArea = $userType === 'web';
+        $guard = $isWebArea ? 'web' : match ($userType) {
             'Web Administrator',
             'Departement Akademik',
             'Departement Keuangan',
@@ -56,7 +59,11 @@ class checkUser
         }
         Auth::shouldUse($guard);
 
-        if (!$user || $user->type !== $userType) {
+        if (!$user) {
+            return redirect()->route('error.access');
+        }
+
+        if (!$isWebArea && $user->type !== $userType) {
             return redirect()->route('error.access');
         }
 
