@@ -162,9 +162,14 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">{{ $pages }}</h5>
-                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
-                        <i class="fas fa-plus-circle me-2"></i>Tambah Pengguna
-                    </button>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route($spref . 'pengguna.dosen-export-pdf') }}" class="btn btn-danger">
+                            <i class="fas fa-file-pdf me-1"></i> Export PDF
+                        </a>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
+                            <i class="fas fa-plus-circle me-2"></i>Tambah Pengguna
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <!-- Quick Stats -->
