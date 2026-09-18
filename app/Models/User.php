@@ -70,8 +70,11 @@ class User extends Authenticatable
             7 => 'admisi.',
         ];
 
-        // Jika type valid, kembalikan prefixnya, kalau tidak 'unknown'
-        return isset($prefixes[$this->attributes['type']]) ? $prefixes[$this->attributes['type']] : 'unknown';
+        // Seluruh akun pada tabel users menggunakan satu area dashboard web.
+        // Hak akses tetap dibedakan oleh middleware checkUser berdasarkan type.
+        // Ini memastikan Staff/Operator tidak diarahkan ke route finance.* / akademik.*
+        // yang belum tersedia dan berakhir 403/404.
+        return isset($prefixes[$this->attributes['type']]) ? 'web-admin.' : 'unknown';
     }
 
 
