@@ -38,85 +38,76 @@ class AuthController extends Controller
 
         $login = $request->input('login');
 
-        // ==== RATE LIMIT ====
-        $maxAttempts = WebSetting::first()->max_login_attempts ?? 5;     // Maksimal percobaan
-        $decaySeconds = WebSetting::first()->login_decay_seconds ?? 60;   // Waktu reset dalam detik
-        $key = 'login:'.Str::lower($request->input('login')).'|'.$request->ip();
+        $settings = WebSetting::first();
+        $maxAttempts = $settings->max_login_attempts ?? 5;
+        $decaySeconds = $settings->login_decay_seconds ?? 60;
+        $key = 'login:' . Str::lower($login) . '|' . $request->ip();
 
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
             Alert::error('Terlalu banyak percobaan', "Coba lagi dalam {$seconds} detik.");
-            return back()
-                ->withErrors(['login' => "Terlalu banyak percobaan. Coba lagi dalam {$seconds} detik."])
-                ->onlyInput('login');
+            return back()->withErrors(['login' => "Terlalu banyak percobaan. Coba lagi dalam {$seconds} detik."])->onlyInput('login');
         }
 
-        // Check login input
         $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        $checkUser = User::where($fieldType, $request->login)->first();
-        $checkLecture= Dosen::where($fieldType, $request->login)->first();
-        $checkStudent = Mahasiswa::where($fieldType, $request->login)->first();
+        // Bersihkan semua guard sebelum login agar session role sebelumnya
+        // tidak ikut terbawa ke role yang baru.
+        Auth::guard('web')->logout();
+        Auth::guard('dosen')->logout();
+        Auth::guard('mahasiswa')->logout();
 
-        // Coba Login Sebagai User / Staff
-        if($checkUser){
-            // Coba untuk melakukan autentikasi menggunakan metode 'attempt' dari facade 'Auth'
-            if (Auth::attempt(array($fieldType => $login, 'password' => $request->input('password'))) ) {
-                // Jika autentikasi berhasil, pengguna akan dialihkan ke dashboard sesuai role
-                if(Auth::user()->prefix == Auth::user()->prefix){
+        // Prioritas tetap mengikuti tabel akun, tetapi guard yang berhasil
+        // ditetapkan secara eksplisit dan tidak pernah dicampur.
+        $checkUser = User::where($fieldType, $login)->first();
+        if ($checkUser && Auth::guard('web')->attempt([
+            $fieldType => $login,
+            'password' => $request->input('password')
+        ])) {
+            $user = Auth::guard('web')->user();
+            Auth::shouldUse('web');
 
-                    Alert::toast('Kamu telah berhasil login sebagai ' . Auth::user()->name, 'success');
-                    return redirect()->route(Auth::user()->prefix . 'profile-render');
-                }
+            Alert::toast('Kamu telah berhasil login sebagai ' . $user->name, 'success');
+            return redirect()->route($user->prefix . 'dashboard-render');
+        }
 
-            }else{
-                RateLimiter::hit($key, $decaySeconds);
-                Alert::error('Error', 'Mohon Maaf, Username / Email atau password salah');
-                return back();
+        $checkLecture = Dosen::where($fieldType, $login)->first();
+        if ($checkLecture && Auth::guard('dosen')->attempt([
+            $fieldType => $login,
+            'password' => $request->input('password')
+        ])) {
+            $dosen = Auth::guard('dosen')->user();
+            Auth::shouldUse('dosen');
+
+            if ($dosen->type === 'Dosen Aktif') {
+                Alert::toast('Kamu telah berhasil login sebagai ' . $dosen->name, 'success');
+                return redirect()->route($dosen->prefix . 'dashboard-render');
             }
 
-        // Coba Login Sebagai Dosen
-        }elseif($checkLecture) {
-            if (Auth::guard('dosen')->attempt(array($fieldType => $login, 'password' => $request->input('password'))) ) {
-                // Jika autentikasi berhasil, pengguna akan dialihkan ke dashboard
-                if(Auth::guard('dosen')->user()->prefix == "dosen."){
-
-                    Alert::toast('Kamu telah berhasil login sebagai ' . Auth::guard('dosen')->user()->name, 'success');
-                    return redirect()->route(Auth::guard('dosen')->user()->prefix . 'profile-render');
-                }
-            }else{
-                RateLimiter::hit($key, $decaySeconds);
-                Alert::error('Error', 'Mohon Maaf, Username / Email atau password salah');
-                return back();
-            }
-
-        // Coba Login Sebagai Mahasiswa
-        }elseif($checkStudent) {
-            if (Auth::guard('mahasiswa')->attempt(array($fieldType => $login, 'password' => $request->input('password'))) ) {
-                // Jika autentikasi berhasil, pengguna akan dialihkan ke dashboard
-                if(Auth::guard('mahasiswa')->user()->type == "Calon Mahasiswa"){
-                    // echo "Kamu berhasil login sebagai " . Auth::guard('mahasiswa')->user()->name;
-
-                    Alert::toast('Kamu telah berhasil login sebagai ' . Auth::guard('mahasiswa')->user()->name, 'success');
-                    return redirect()->route(Auth::guard('mahasiswa')->user()->prefix . 'profile-render');
-                } else if(Auth::guard('mahasiswa')->user()->type == "Mahasiswa Aktif"){
-                    // echo "Kamu berhasil login sebagai " . Auth::guard('mahasiswa')->user()->name;
-
-                    Alert::toast('Kamu telah berhasil login sebagai ' . Auth::guard('mahasiswa')->user()->name, 'success');
-                    return redirect()->route(Auth::guard('mahasiswa')->user()->prefix . 'profile-render');
-                }
-
-            }else{
-                RateLimiter::hit($key, $decaySeconds);
-                Alert::error('Error', 'Mohon Maaf, Username / Email atau password salah');
-                return back();
-            }
-
-        // Jika Akun Tidak Terdaftar
-        }else {
-            Alert::error('Error', 'Mohon Maaf, Akun anda tidak terdaftar pada system kami.');
+            Auth::guard('dosen')->logout();
+            Alert::error('Akun Dosen tidak aktif', 'Akun dosen Anda tidak dapat digunakan untuk masuk.');
             return back();
         }
+
+        $checkStudent = Mahasiswa::where($fieldType, $login)->first();
+        if ($checkStudent && Auth::guard('mahasiswa')->attempt([
+            $fieldType => $login,
+            'password' => $request->input('password')
+        ])) {
+            $student = Auth::guard('mahasiswa')->user();
+            Auth::shouldUse('mahasiswa');
+
+            if (in_array($student->type, ['Calon Mahasiswa', 'Mahasiswa Aktif'], true)) {
+                Alert::toast('Kamu telah berhasil login sebagai ' . $student->name, 'success');
+                return redirect()->route($student->prefix . 'profile-render');
+            }
+
+            Auth::guard('mahasiswa')->logout();
+        }
+
+        RateLimiter::hit($key, $decaySeconds);
+        Alert::error('Error', 'Mohon Maaf, Username / Email atau password salah');
+        return back()->onlyInput('login');
     }
 
     public function handleLogout(Request $request) {
