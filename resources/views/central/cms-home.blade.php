@@ -587,8 +587,5 @@ body.cms-front-page .page-body > .container-xl{
         </div>
     </section>
 
-    <div class="container-xl text-center admin-note">
-        Konten section halaman depan dapat dikelola dari Admin Panel → Pengaturan → Front Page.
-    </div>
 </div>
 @endsection
