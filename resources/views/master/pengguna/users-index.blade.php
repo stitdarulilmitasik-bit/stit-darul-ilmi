@@ -270,16 +270,18 @@
                                                 <a href="{{ route($spref.'pengguna.users-views', $item->code) }}" class="btn btn-sm btn-secondary" data-bs-toggle="tooltip" title="Lihat Pengguna">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </a>
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#editData{{ $item->code }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="Edit Pengguna">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form action="{{ route($spref . 'pengguna.users-delete', $item->code) }}" method="POST" class="d-inline" id="delete-form-{{ $item->code }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="button" class="btn btn-sm btn-danger" data-confirm-delete="true" data-bs-toggle="tooltip" title="Hapus Pengguna" onclick="confirmDelete('{{ $item->code }}')">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                @if ((int) Auth::guard('web')->user()?->type === 0)
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#editData{{ $item->code }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="Edit Pengguna">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form action="{{ route($spref . 'pengguna.users-delete', $item->code) }}" method="POST" class="d-inline" id="delete-form-{{ $item->code }}">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="btn btn-sm btn-danger" data-confirm-delete="true" data-bs-toggle="tooltip" title="Hapus Pengguna" onclick="confirmDelete('{{ $item->code }}')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
