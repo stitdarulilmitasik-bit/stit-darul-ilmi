@@ -74,7 +74,7 @@ class AkademikOperasionalController extends Controller
             'code'=>'JDW-'.Str::random(8), 'dosen_id'=>$dosen->id, 'ruang_id'=>$request->ruang_id, 'matkul_id'=>$request->matkul_id,
             'jenis_kelas_id'=>$request->jenis_kelas_id, 'waktu_kuliah_id'=>$request->waktu_kuliah_id, 'bsks'=>$request->bsks,
             'pertemuan'=>$request->pertemuan, 'hari'=>$request->hari, 'metode'=>$request->metode, 'tanggal'=>$request->tanggal,
-            'link'=>$request->link, 'created_by'=>Auth::id()
+            'link'=>$request->link, 'created_by'=>Auth::guard('dosen')->id()
         ]);
         $jadwal->kelas()->attach($request->kelas_ids);
         return back()->with('success','Jadwal kuliah berhasil ditambahkan.');
@@ -91,7 +91,7 @@ class AkademikOperasionalController extends Controller
             'metode'=>'required|string|in:Tatap Muka,Teleconference', 'tanggal'=>'required|date', 'link'=>'nullable|url',
             'kelas_ids'=>'required|array', 'kelas_ids.*'=>'integer|exists:kelas,id'
         ]);
-        $jadwal->update($request->only(['ruang_id','matkul_id','jenis_kelas_id','waktu_kuliah_id','bsks','pertemuan','hari','metode','tanggal','link']) + ['updated_by'=>Auth::id()]);
+        $jadwal->update($request->only(['ruang_id','matkul_id','jenis_kelas_id','waktu_kuliah_id','bsks','pertemuan','hari','metode','tanggal','link']) + ['updated_by'=>Auth::guard('dosen')->id()]);
         $jadwal->kelas()->sync($request->kelas_ids);
         return back()->with('success','Jadwal kuliah berhasil diperbarui.');
     }
@@ -116,7 +116,7 @@ class AkademikOperasionalController extends Controller
             'uas'=>'nullable|numeric|min:0|max:100','praktikum'=>'nullable|numeric|min:0|max:100','kehadiran'=>'nullable|numeric|min:0|max:100',
             'notes'=>'nullable|string'
         ]);
-        $nilai->update($request->only(['tugas_1','tugas_2','tugas_3','quiz_1','quiz_2','uts','uas','praktikum','kehadiran','notes']) + ['updated_by'=>Auth::id()]);
+        $nilai->update($request->only(['tugas_1','tugas_2','tugas_3','quiz_1','quiz_2','uts','uas','praktikum','kehadiran','notes']) + ['updated_by'=>Auth::guard('dosen')->id()]);
         $nilai->refresh();
         $nilai->hitungNilaiAkhir();
         return back()->with('success','Nilai berhasil diperbarui.');
