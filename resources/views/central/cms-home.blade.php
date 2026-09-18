@@ -446,10 +446,6 @@ body.cms-front-page .page-body > .container-xl{
                     </div>
                     <div class="col-lg-5">
                         <div class="cms-hero-visual">
-                            <div class="cms-floating-card">
-                                <strong>{{ $programStudis->count() }}</strong>
-                                <span>Program studi aktif</span>
-                            </div>
                             @if($hero?->image)
                                 <img src="{{ $hero->image }}" alt="{{ $hero->title ?: $webs->school_name }}">
                             @else
