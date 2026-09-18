@@ -16,6 +16,8 @@ use App\Models\Mahasiswa;
 use App\Models\Akademik\ProgramStudi;
 use App\Models\Pengaturan\WebSetting;
 use App\Exports\MahasiswaExport;
+use App\Exports\MahasiswaImportTemplate;
+use App\Imports\MahasiswaImport;
 use Maatwebsite\Excel\Facades\Excel;
 // Use Plugins
 
@@ -62,6 +64,45 @@ class MahasiswaController extends Controller
             new MahasiswaExport(),
             'data-mahasiswa-' . now()->format('Y-m-d') . '.xlsx'
         );
+    }
+
+    public function downloadMahasiswaImportTemplate()
+    {
+        return Excel::download(
+            new MahasiswaImportTemplate(),
+            'template-import-mahasiswa.xlsx'
+        );
+    }
+
+    public function importMahasiswaExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $import = new MahasiswaImport();
+            Excel::import($import, $request->file('file'));
+
+            if (!empty($import->errors)) {
+                DB::rollBack();
+                return redirect()->back()->with('error',
+                    'Import dibatalkan. ' . implode(' ', array_slice($import->errors, 0, 10))
+                    . (count($import->errors) > 10 ? ' Dan masih ada kesalahan lainnya.' : '')
+                );
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success',
+                "Import berhasil. {$import->created} mahasiswa baru ditambahkan dan {$import->updated} data diperbarui."
+            );
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Import mahasiswa gagal: ' . $e->getMessage());
+        }
     }
 
     public function viewMahasiswa($code)
