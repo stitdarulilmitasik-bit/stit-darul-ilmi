@@ -243,7 +243,9 @@
                                             <option value="0">Calon Mahasiswa Baru</option>
                                             <option value="1">Mahasiswa Aktif</option>
                                             <option value="2">Mahasiswa Non-Aktif</option>
-                                            <option value="3">Mahasiswa Alumni</option>
+                                            <option value="3">Mahasiswa Lulus</option>
+                                            <option value="4">Mahasiswa Cuti</option>
+                                            <option value="5">Mahasiswa Pindah</option>
                                         </select>
                                         @error('type')
                                             <small class="text-danger">{{ $message }}</small>
@@ -277,6 +279,7 @@
                                     <th>Program Studi</th>
                                     <th>Semester</th>
                                     <th>Status</th>
+                                    <th>Keterangan Akademik</th>
                                     <th class="text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -298,9 +301,28 @@
                                         <td data-label="Program Studi">{{ $item->programStudi->name ?? '-' }}</td>
                                         <td data-label="Semester">{{ $item->semester }}</td>
                                         <td data-label="Status">
-                                            <span class="badge {{ $item->raw_type == 1 ? 'bg-light-success text-success' : ($item->raw_type == 0 ? 'bg-light-info text-info' : ($item->raw_type == 2 ? 'bg-light-warning text-warning' : 'bg-light-secondary text-secondary')) }}">
+                                            <span class="badge {{ $item->raw_type == 1 ? 'bg-light-success text-success' : ($item->raw_type == 0 ? 'bg-light-info text-info' : ($item->raw_type == 4 ? 'bg-light-warning text-warning' : ($item->raw_type == 2 ? 'bg-light-warning text-warning' : 'bg-light-secondary text-secondary'))) }}">
                                                 {{ $item->type }}
                                             </span>
+                                        </td>
+                                        <td data-label="Keterangan Akademik">
+                                            @php
+                                                $semester = (int) ($item->semester ?? 0);
+                                                $periode = $semester > 0 ? ($semester % 2 === 0 ? 'Genap' : 'Ganjil') : null;
+                                                $angkatan = $item->tahunAkademikRegistrasi?->name;
+                                            @endphp
+                                            <div class="d-flex flex-column gap-1">
+                                                @if ($item->raw_type == 4)
+                                                    <span class="badge bg-light-warning text-warning align-self-start"><i class="fas fa-pause-circle me-1"></i>Cuti</span>
+                                                @elseif ($periode)
+                                                    <span class="badge bg-light-primary text-primary align-self-start"><i class="fas fa-calendar-alt me-1"></i>{{ $periode }} · Semester {{ $semester }}</span>
+                                                @else
+                                                    <span class="text-muted">Belum ada semester</span>
+                                                @endif
+                                                @if ($angkatan)
+                                                    <small class="text-muted"><i class="fas fa-graduation-cap me-1"></i>Angkatan {{ $angkatan }}</small>
+                                                @endif
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
@@ -437,7 +459,9 @@
                                         <option value="0" {{ $item->raw_type == 0 ? 'selected' : '' }}>Calon Mahasiswa Baru</option>
                                         <option value="1" {{ $item->raw_type == 1 ? 'selected' : '' }}>Mahasiswa Aktif</option>
                                         <option value="2" {{ $item->raw_type == 2 ? 'selected' : '' }}>Mahasiswa Non-Aktif</option>
-                                        <option value="3" {{ $item->raw_type == 3 ? 'selected' : '' }}>Mahasiswa Alumni</option>
+                                        <option value="3" {{ $item->raw_type == 3 ? 'selected' : '' }}>Mahasiswa Lulus</option>
+                                        <option value="4" {{ $item->raw_type == 4 ? 'selected' : '' }}>Mahasiswa Cuti</option>
+                                        <option value="5" {{ $item->raw_type == 5 ? 'selected' : '' }}>Mahasiswa Pindah</option>
                                     </select>
                                     @error('type')
                                         <small class="text-danger">{{ $message }}</small>
