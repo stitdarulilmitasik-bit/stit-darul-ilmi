@@ -19,10 +19,6 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
     public int $created = 0;
     public int $updated = 0;
 
-    /**
-     * Kolom tanggal pada tabel mahasiswas yang harus disimpan dalam format
-     * MySQL YYYY-MM-DD. Excel sering mengirim nilai seperti 03-08-1997.
-     */
     protected array $dateColumns = [
         'bio_datebirth',
         'father_datebirth',
@@ -30,15 +26,6 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
         'guard_datebirth',
     ];
 
-    /**
-     * Normalisasi tanggal dari Excel ke format MySQL YYYY-MM-DD.
-     *
-     * Mendukung:
-     * - DD-MM-YYYY
-     * - DD/MM/YYYY
-     * - YYYY-MM-DD
-     * - nilai serial tanggal Excel
-     */
     protected function normalizeDateValue($value, int $excelRow, string $column): ?string
     {
         if ($value === null || $value === '') {
@@ -49,7 +36,6 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
             return $value->format('Y-m-d');
         }
 
-        // Excel dapat mengirim tanggal sebagai angka serial, misalnya 35641.
         if (is_numeric($value) && (float) $value > 0) {
             try {
                 return ExcelDate::excelToDateTimeObject((float) $value)->format('Y-m-d');
@@ -61,18 +47,9 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
 
         $value = trim((string) $value);
 
-        $formats = [
-            'd-m-Y',
-            'd/m/Y',
-            'Y-m-d',
-            'd.m.Y',
-            'm/d/Y',
-        ];
-
-        foreach ($formats as $format) {
+        foreach (['d-m-Y', 'd/m/Y', 'Y-m-d', 'd.m.Y', 'm/d/Y'] as $format) {
             try {
                 $date = Carbon::createFromFormat($format, $value);
-
                 if ($date !== false && $date->format($format) === $value) {
                     return $date->format('Y-m-d');
                 }
@@ -113,8 +90,6 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
         ];
 
         foreach ($rows as $index => $row) {
-            // ToCollection mengirim setiap baris sebagai Illuminate\Support\Collection.
-            // Ubah menjadi array agar akses $row['kolom'] dan array_key_exists() aman.
             $row = $row->toArray();
             $excelRow = $index + 2;
 
@@ -129,8 +104,7 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
-            $semesterValue = $row['semester'] ?? 0;
-            $semester = (int) $semesterValue;
+            $semester = (int) ($row['semester'] ?? 0);
             if ($semester < 0 || $semester > 14) {
                 $this->errors[] = "Baris {$excelRow}: Semester harus antara 0 sampai 14.";
                 continue;
@@ -201,23 +175,16 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
                 }
 
                 if ($value !== null && in_array($column, $this->dateColumns, true)) {
-                    $normalizedDate = $this->normalizeDateValue($value, $excelRow, $column);
+                    $value = $this->normalizeDateValue($value, $excelRow, $column);
 
-                    if ($normalizedDate === null) {
-                        // Jangan simpan nilai tanggal mentah yang akan ditolak MySQL.
+                    if ($value === null) {
                         continue;
                     }
-
-                    $value = $normalizedDate;
                 }
 
                 if ($value !== null) {
                     $data[$column] = $value;
                 }
-            }
-
-            if (!empty($this->errors) && str_contains(end($this->errors), "Baris {$excelRow}: Format tanggal")) {
-                continue;
             }
 
             $data['name'] = $name;
@@ -227,12 +194,8 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
             $data['type'] = $type;
             $data['taka_regist'] = $takaRegist;
 
-            if (!isset($data['taka_active'])) {
-                $data['taka_active'] = 0;
-            }
-            if (!isset($data['kelas_id'])) {
-                $data['kelas_id'] = 0;
-            }
+            $data['taka_active'] ??= 0;
+            $data['kelas_id'] ??= 0;
 
             if ($phone !== '') {
                 $data['phone'] = $phone;
@@ -253,6 +216,24 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
                     $existing->restore();
                 }
 
+                /*
+                 * NIM adalah kunci pencocokan utama. Jika code dari Excel
+                 * ternyata sudah dimiliki mahasiswa lain, jangan menimpa code
+                 * milik mahasiswa tersebut. Data mahasiswa tetap di-update
+                 * menggunakan record yang ditemukan berdasarkan NIM.
+                 */
+                if (!empty($data['code'])) {
+                    $codeOwner = Mahasiswa::withTrashed()
+                        ->where('code', $data['code'])
+                        ->where('id', '!=', $existing->id)
+                        ->first();
+
+                    if ($codeOwner) {
+                        $this->errors[] = "Baris {$excelRow}: Code '{$data['code']}' sudah digunakan mahasiswa lain (ID {$codeOwner->id}). Code mahasiswa '{$nim}' tidak diubah.";
+                        unset($data['code']);
+                    }
+                }
+
                 if ($password !== '') {
                     $data['password'] = Hash::make($password);
                 } else {
@@ -266,6 +247,7 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
                         ->where('email', $data['email'])
                         ->where('id', '!=', $existing->id)
                         ->exists();
+
                     if ($emailExists) {
                         $this->errors[] = "Baris {$excelRow}: Email '{$data['email']}' sudah digunakan mahasiswa lain.";
                         continue;
@@ -277,6 +259,7 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
                         ->where('phone', $data['phone'])
                         ->where('id', '!=', $existing->id)
                         ->exists();
+
                     if ($phoneExists) {
                         $this->errors[] = "Baris {$excelRow}: Nomor Telepon '{$data['phone']}' sudah digunakan mahasiswa lain.";
                         continue;
@@ -307,8 +290,10 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
                 ? trim((string) $row['code'])
                 : 'MHS-' . strtoupper(Str::random(8));
 
-            if (Mahasiswa::withTrashed()->where('code', $data['code'])->exists()) {
-                $this->errors[] = "Baris {$excelRow}: Code '{$data['code']}' sudah digunakan.";
+            $codeExists = Mahasiswa::withTrashed()->where('code', $data['code'])->exists();
+
+            if ($codeExists) {
+                $this->errors[] = "Baris {$excelRow}: Code '{$data['code']}' sudah digunakan mahasiswa lain. Data tidak dibuat.";
                 continue;
             }
 
