@@ -441,6 +441,21 @@
 
         // Konfirmasi delete dengan SweetAlert
         function confirmDelete(code) {
+            const form = document.getElementById('delete-form-' + code);
+
+            if (!form) {
+                return;
+            }
+
+            // Fallback jika SweetAlert gagal dimuat: proses hapus tetap dapat
+            // dilanjutkan melalui konfirmasi browser biasa.
+            if (typeof Swal === 'undefined') {
+                if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
+                    form.submit();
+                }
+                return;
+            }
+
             Swal.fire({
                 title: 'Apakah Anda yakin?',
                 text: "Data pengguna yang dihapus tidak dapat dikembalikan!",
@@ -452,7 +467,7 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('delete-form-' + code).submit();
+                    form.submit();
                 }
             });
         }
