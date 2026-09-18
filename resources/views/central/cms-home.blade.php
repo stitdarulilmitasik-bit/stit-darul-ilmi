@@ -371,6 +371,19 @@ body.cms-front-page .page-body > .container-xl{
 @section('content')
 <div class="cms-home">
 @php
+    // Bersihkan literal \\n / \\r yang tersimpan di konten CMS agar tidak tampil di halaman.
+    $cleanCmsText = function ($value) {
+        return str_replace(["\\\\r\\\\n", "\\\\n", "\\\\r"], ' ', (string) $value);
+    };
+
+    $sections->each(function ($section) use ($cleanCmsText) {
+        foreach (['title', 'subtitle', 'content', 'button_text', 'button_url', 'image'] as $field) {
+            if (isset($section->{$field})) {
+                $section->{$field} = $cleanCmsText($section->{$field});
+            }
+        }
+    });
+
     $hero = $sections->firstWhere('section_key', 'hero');
     $about = $sections->firstWhere('section_key', 'about');
 
