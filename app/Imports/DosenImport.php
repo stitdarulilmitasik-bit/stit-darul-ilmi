@@ -4,55 +4,101 @@ namespace App\Imports;
 
 use App\Models\Dosen;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Illuminate\Support\Collection;
 
 class DosenImport implements ToCollection, WithHeadingRow
 {
+    protected array $ignored = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'created_by',
+        'updated_by',
+        'deleted_by',
+    ];
+
     public function collection(Collection $rows)
     {
-        $columns = Schema::getColumnListing('dosens');
-        $ignored = ['id', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by', 'deleted_by'];
+        $columns = array_values(array_diff(
+            Schema::getColumnListing('dosens'),
+            $this->ignored
+        ));
 
         foreach ($rows as $row) {
-            $data = [];
-            foreach ($columns as $column) {
-                if (in_array($column, $ignored, true) || !array_key_exists($column, $row->toArray())) {
-                    continue;
-                }
-                $value = $row[$column];
-                if ($value !== null && $value !== '') {
-                    $data[$column] = $value;
-                }
-            }
+            $row = $row->toArray();
 
-            if (empty($data['name']) || empty($data['email']) || empty($data['phone'])) {
+            if ($this->isEmptyRow($row)) {
                 continue;
             }
 
-            $existing = !empty($data['code'])
-                ? Dosen::withTrashed()->where('code', $data['code'])->first()
-                : (!empty($data['email']) ? Dosen::withTrashed()->where('email', $data['email'])->first() : null);
-
-            if (isset($data['password']) && $data['password'] !== '') {
-                $data['password'] = Hash::make($data['password']);
+            $data = [];
+            foreach ($columns as $column) {
+                if (array_key_exists($column, $row)) {
+                    $data[$column] = $row[$column];
+                }
             }
 
-            if (empty($data['code'])) {
-                $data['code'] = 'DSN-' . strtoupper(Str::random(8));
+            $id = $data['id'] ?? null;
+            $code = $data['code'] ?? null;
+            $email = $data['email'] ?? null;
+
+            $existing = null;
+
+            if (!empty($id)) {
+                $existing = Dosen::withTrashed()->find($id);
+            }
+
+            if (!$existing && !empty($code)) {
+                $existing = Dosen::withTrashed()->where('code', $code)->first();
+            }
+
+            if (!$existing && !empty($email)) {
+                $existing = Dosen::withTrashed()->where('email', $email)->first();
+            }
+
+            unset($data['id']);
+
+            if (array_key_exists('password', $data)) {
+                $password = trim((string) $data['password']);
+
+                if ($password === '') {
+                    if ($existing) {
+                        unset($data['password']);
+                    } else {
+                        $data['password'] = Hash::make($email ?: ($code ?: 'password'));
+                    }
+                } elseif (!preg_match('/^\$2[ayb]\$/', $password)) {
+                    $data['password'] = Hash::make($password);
+                }
             }
 
             if ($existing) {
                 if ($existing->trashed()) {
                     $existing->restore();
                 }
+
                 $existing->update($data);
             } else {
+                if (empty($data['code'])) {
+                    $data['code'] = 'DSN-' . strtoupper(\Illuminate\Support\Str::random(8));
+                }
+
                 Dosen::create($data);
             }
         }
+    }
+
+    protected function isEmptyRow(array $row): bool
+    {
+        foreach ($row as $value) {
+            if ($value !== null && trim((string) $value) !== '') {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
