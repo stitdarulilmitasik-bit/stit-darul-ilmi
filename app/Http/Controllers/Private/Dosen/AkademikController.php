@@ -76,7 +76,7 @@ class AkademikController extends Controller
                 'prodi_id' => $request->prodi_id, 'requi_id' => $request->requi_id, 'dosen1_id' => $dosen->id,
                 'dosen2_id' => null, 'dosen3_id' => null, 'semester' => $request->semester, 'bsks' => $request->bsks,
                 'desc' => $request->desc, 'photo' => $photo, 'docs_rps' => $docsRps, 'docs_kontrak_kuliah' => $docsKontrak,
-                'created_by' => Auth::id(),
+                'created_by' => Auth::guard('dosen')->id(),
             ]);
             DB::commit();
             return back()->with('success', 'Mata kuliah berhasil ditambahkan dan ditetapkan kepada Anda sebagai Dosen 1.');
@@ -105,7 +105,7 @@ class AkademikController extends Controller
         $mataKuliah->update([
             'name' => $request->name, 'kurikulum_id' => $request->kurikulum_id, 'prodi_id' => $request->prodi_id,
             'requi_id' => $request->requi_id, 'semester' => $request->semester, 'bsks' => $request->bsks, 'desc' => $request->desc,
-            'photo' => $photo, 'docs_rps' => $docsRps, 'docs_kontrak_kuliah' => $docsKontrak, 'updated_by' => Auth::id(),
+            'photo' => $photo, 'docs_rps' => $docsRps, 'docs_kontrak_kuliah' => $docsKontrak, 'updated_by' => Auth::guard('dosen')->id(),
         ]);
         return back()->with('success', 'Mata kuliah berhasil diperbarui.');
     }
@@ -117,7 +117,7 @@ class AkademikController extends Controller
             $q->where('dosen1_id', $dosen->id)->orWhere('dosen2_id', $dosen->id)->orWhere('dosen3_id', $dosen->id);
         })->firstOrFail();
         if ($mataKuliah->jadwalKuliah()->count() > 0) return back()->with('error', 'Mata kuliah tidak dapat dihapus karena masih memiliki jadwal kuliah.');
-        $mataKuliah->update(['deleted_by' => Auth::id()]);
+        $mataKuliah->update(['deleted_by' => Auth::guard('dosen')->id()]);
         $mataKuliah->delete();
         return back()->with('success', 'Mata kuliah berhasil dihapus.');
     }
