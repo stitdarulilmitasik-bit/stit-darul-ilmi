@@ -2,26 +2,25 @@
 
 namespace App\Helper;
 
+use Illuminate\Support\Facades\Auth;
+
 trait roleTrait
 {
     private function setPrefix()
     {
-        $user = \Illuminate\Support\Facades\Auth::guard('web')->user();
+        $user = Auth::guard('web')->user();
         $rawType = $user?->raw_type;
 
-        switch ($rawType) {
-            case 1:
-                return 'finance.';
-            case 2:
-                return 'officer.';
-            case 3:
-                return 'academic.';
-            case 4:
-                return 'admin.';
-            case 5:
-                return 'support.';
-            default:
-                return 'web-admin.';
-        }
+        return match ((int) $rawType) {
+            0 => 'web-admin.',
+            1 => 'akademik.',
+            2 => 'finance.',
+            3 => 'kemahasiswaan.',
+            4 => 'it.',
+            5 => 'library.',
+            6 => 'umum.',
+            7 => 'admisi.',
+            default => 'unknown.',
+        };
     }
 }
