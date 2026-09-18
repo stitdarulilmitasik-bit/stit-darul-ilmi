@@ -87,6 +87,18 @@
                 transform: translateY(0);
             }
         }
+        /* Hero/banner global dibuat lebih ringkas agar konten halaman cepat terlihat. */
+        .page-body .page-header,
+        .page-body .hero,
+        .page-body [class*="hero"] {
+            min-height: 0 !important;
+        }
+
+        .page-body .page-header {
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+
         /* Front page: ikuti tinggi konten aktual, bukan tinggi viewport. */
         body.cms-front-page,
         body.cms-front-page .page,
