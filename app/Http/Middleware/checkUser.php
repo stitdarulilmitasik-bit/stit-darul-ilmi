@@ -10,25 +10,46 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class checkUser
 {
-
+    /**
+     * Memastikan request hanya dilayani oleh guard yang sesuai dengan role.
+     * Setiap role memiliki session/guard sendiri sehingga akun tidak tercampur.
+     */
     public function handle(Request $request, Closure $next, $userType): Response
     {
-        // Cek apakah pengguna sudah login sebagai salah satu guard
-        if (Auth::check() || Auth::guard('dosen')->check() || Auth::guard('mahasiswa')->check()) {
-            $user = Auth::user() ?: Auth::guard('dosen')->user() ?: Auth::guard('mahasiswa')->user();
+        $guard = match ($userType) {
+            'Web Administrator',
+            'Departement Akademik',
+            'Departement Keuangan',
+            'Departement Kemahasiswaan',
+            'Departement Infrastruktur & IT',
+            'Departement Perpustakaan',
+            'Departement Umum',
+            'Departement Admisi' => 'web',
+            'Dosen Aktif' => 'dosen',
+            'Mahasiswa Aktif', 'Calon Mahasiswa' => 'mahasiswa',
+            default => null,
+        };
 
-            // Cek tipe pengguna
-            if ($user->type === $userType) {
-                return $next($request);
-            }
-
-            // Redirect ke halaman error akses
-            // return redirect()->route('error.access');
-            Alert::error('error', 'kamu tidak diizinkan masuk');
-            return back();
+        if (!$guard) {
+            Alert::error('Error', 'Role pengguna tidak dikenali.');
+            return redirect()->route('auth.render-signin');
         }
 
-        // Jika belum login, arahkan ke rute 'auth-login'
-        return redirect()->route('auth.render-signin');
+        // Jangan pernah mengambil user dari guard lain.
+        Auth::shouldUse($guard);
+
+        if (!Auth::guard($guard)->check()) {
+            // Jika ada sesi role lain, jangan biarkan sesi tersebut mengakses
+            // route role ini. Arahkan kembali ke halaman login.
+            return redirect()->route('auth.render-signin');
+        }
+
+        $user = Auth::guard($guard)->user();
+
+        if (!$user || $user->type !== $userType) {
+            return redirect()->route('error.access');
+        }
+
+        return $next($request);
     }
 }
