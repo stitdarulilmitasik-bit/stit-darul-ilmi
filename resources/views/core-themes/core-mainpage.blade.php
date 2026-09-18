@@ -109,6 +109,29 @@
         .page-body {
             margin-top: 0 !important;
             padding-top: 0 !important;
+            margin-bottom: 0 !important;
+            display: block !important;
+            flex: none !important;
+            min-height: 0 !important;
+            height: auto !important;
+        }
+
+        /* Paksa konten utama menempel tepat di bawah navbar.
+           Hindari ruang kosong yang dapat muncul dari layout flex Tabler. */
+        .page-wrapper {
+            display: block !important;
+            flex: none !important;
+            min-height: 0 !important;
+            height: auto !important;
+        }
+
+        .page-body > .container-xl {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        .page-body > .container-xl > .container-xl {
+            margin-top: 0 !important;
         }
 
         /* Navbar full width tanpa menyebabkan overflow/geser vertikal. */
