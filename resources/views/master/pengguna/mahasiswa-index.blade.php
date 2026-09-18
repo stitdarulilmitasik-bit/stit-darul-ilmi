@@ -277,6 +277,7 @@
                                     <th>Nama</th>
                                     <th>NIM</th>
                                     <th>Program Studi</th>
+                                    <th>Nomor Telepon</th>
                                     <th>Semester</th>
                                     <th>Status</th>
                                     <th>Semester / Periode</th>
@@ -299,6 +300,7 @@
                                         </td>
                                         <td data-label="NIM">{{ $item->numb_nim ?? '-' }}</td>
                                         <td data-label="Program Studi">{{ $item->programStudi->name ?? '-' }}</td>
+                                        <td data-label="Nomor Telepon">{{ $item->phone ?? '-' }}</td>
                                         <td data-label="Semester">{{ $item->semester }}</td>
                                         <td data-label="Status">
                                             <span class="badge {{ $item->raw_type == 1 ? 'bg-light-success text-success' : ($item->raw_type == 0 ? 'bg-light-info text-info' : ($item->raw_type == 4 ? 'bg-light-warning text-warning' : ($item->raw_type == 2 ? 'bg-light-warning text-warning' : 'bg-light-secondary text-secondary'))) }}">
@@ -309,7 +311,10 @@
                                             @php
                                                 $semester = (int) ($item->semester ?? 0);
                                                 $periode = $semester > 0 ? ($semester % 2 === 0 ? 'Genap' : 'Ganjil') : null;
-                                                $angkatan = $item->tahunAkademikRegistrasi?->name;
+                                                $takaRegist = $item->taka_regist;
+                                                $angkatan = $takaRegist !== null && $takaRegist !== ''
+                                                    ? (strlen((string) $takaRegist) === 2 ? '20' . $takaRegist : $takaRegist)
+                                                    : null;
                                             @endphp
                                             <div class="d-flex flex-column gap-1">
                                                 @if ($semester > 0)
