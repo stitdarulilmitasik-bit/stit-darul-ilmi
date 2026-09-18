@@ -97,8 +97,8 @@ body.cms-front-page .page-body > .container-xl{
 .cms-hero .hero-subtitle{
     max-width:680px;
     color:#586554;
-    font-size:1.12rem;
-    line-height:1.75;
+    font-size:1.5rem;
+    line-height:2.15;
     font-weight:500;
 }
 .cms-actions{
