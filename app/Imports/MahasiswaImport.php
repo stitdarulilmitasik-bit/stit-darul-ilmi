@@ -4,18 +4,86 @@ namespace App\Imports;
 
 use App\Models\Mahasiswa;
 use App\Models\Akademik\ProgramStudi;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class MahasiswaImport implements ToCollection, WithHeadingRow
 {
     public array $errors = [];
     public int $created = 0;
     public int $updated = 0;
+
+    /**
+     * Kolom tanggal pada tabel mahasiswas yang harus disimpan dalam format
+     * MySQL YYYY-MM-DD. Excel sering mengirim nilai seperti 03-08-1997.
+     */
+    protected array $dateColumns = [
+        'bio_datebirth',
+        'father_datebirth',
+        'mother_datebirth',
+        'guard_datebirth',
+    ];
+
+    /**
+     * Normalisasi tanggal dari Excel ke format MySQL YYYY-MM-DD.
+     *
+     * Mendukung:
+     * - DD-MM-YYYY
+     * - DD/MM/YYYY
+     * - YYYY-MM-DD
+     * - nilai serial tanggal Excel
+     */
+    protected function normalizeDateValue($value, int $excelRow, string $column): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d');
+        }
+
+        // Excel dapat mengirim tanggal sebagai angka serial, misalnya 35641.
+        if (is_numeric($value) && (float) $value > 0) {
+            try {
+                return ExcelDate::excelToDateTimeObject((float) $value)->format('Y-m-d');
+            } catch (\Throwable $e) {
+                $this->errors[] = "Baris {$excelRow}: Format tanggal {$column} '{$value}' tidak valid.";
+                return null;
+            }
+        }
+
+        $value = trim((string) $value);
+
+        $formats = [
+            'd-m-Y',
+            'd/m/Y',
+            'Y-m-d',
+            'd.m.Y',
+            'm/d/Y',
+        ];
+
+        foreach ($formats as $format) {
+            try {
+                $date = Carbon::createFromFormat($format, $value);
+
+                if ($date !== false && $date->format($format) === $value) {
+                    return $date->format('Y-m-d');
+                }
+            } catch (\Throwable $e) {
+                // Coba format berikutnya.
+            }
+        }
+
+        $this->errors[] = "Baris {$excelRow}: Format tanggal {$column} '{$value}' tidak valid. Gunakan DD-MM-YYYY atau YYYY-MM-DD.";
+        return null;
+    }
 
     public function collection(Collection $rows)
     {
@@ -45,7 +113,7 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
         ];
 
         foreach ($rows as $index => $row) {
-            // ToCollection mengirim setiap baris sebagai Illuminate\\Support\\Collection.
+            // ToCollection mengirim setiap baris sebagai Illuminate\Support\Collection.
             // Ubah menjadi array agar akses $row['kolom'] dan array_key_exists() aman.
             $row = $row->toArray();
             $excelRow = $index + 2;
@@ -132,9 +200,24 @@ class MahasiswaImport implements ToCollection, WithHeadingRow
                     $value = null;
                 }
 
+                if ($value !== null && in_array($column, $this->dateColumns, true)) {
+                    $normalizedDate = $this->normalizeDateValue($value, $excelRow, $column);
+
+                    if ($normalizedDate === null) {
+                        // Jangan simpan nilai tanggal mentah yang akan ditolak MySQL.
+                        continue;
+                    }
+
+                    $value = $normalizedDate;
+                }
+
                 if ($value !== null) {
                     $data[$column] = $value;
                 }
+            }
+
+            if (!empty($this->errors) && str_contains(end($this->errors), "Baris {$excelRow}: Format tanggal")) {
+                continue;
             }
 
             $data['name'] = $name;
