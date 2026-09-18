@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use PDF;
 // Use Models
 use App\Models\User;
 use App\Models\Pengaturan\WebSetting;
@@ -28,6 +29,26 @@ class UsersController extends Controller
         $data['users'] = User::latest()->get();
         
         return view('master.pengguna.users-index', $data, compact('user'));
+    }
+
+
+    public function exportUsersPDF()
+    {
+        try {
+            $users = User::latest()->get();
+
+            $data = [
+                'users' => $users,
+                'webs' => WebSetting::first(),
+            ];
+
+            $pdf = PDF::loadView('master.pengguna.users-pdf', $data)
+                ->setPaper('a4', 'landscape');
+
+            return $pdf->download('daftar-pengguna-' . now()->format('Y-m-d') . '.pdf');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal export PDF pengguna: ' . $e->getMessage());
+        }
     }
 
     public function viewUsers($code)
