@@ -444,7 +444,7 @@
             <!-- END PAGE HEADER -->
             <!-- BEGIN PAGE BODY -->
             <div class="page-body">
-                <div class="container-xl my-auto">
+                <div class="container-xl">
                     @include('core-themes.components.alerts')
                     @yield('content')
                     @include('sweetalert::alert')
