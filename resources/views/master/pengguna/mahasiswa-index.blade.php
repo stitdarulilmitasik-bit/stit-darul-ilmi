@@ -379,7 +379,7 @@
                                         <td data-label="NIM">{{ $item->numb_nim ?? '-' }}</td>
                                         <td data-label="Program Studi">{{ $item->programStudi->name ?? '-' }}</td>
                                         <td data-label="Nomor Telepon">{{ $item->phone ?? '-' }}</td>
-                                        <td data-label="Alamat">{{ $item->ktp_village ?? '-' }}</td>
+                                        <td data-label="Alamat">{{ $item->ktp_addres ?? '-' }}</td>
                                         <td data-label="Status">
                                             <span class="badge {{ $item->raw_type == 1 ? 'bg-light-success text-success' : ($item->raw_type == 0 ? 'bg-light-info text-info' : ($item->raw_type == 4 ? 'bg-light-warning text-warning' : ($item->raw_type == 2 ? 'bg-light-warning text-warning' : 'bg-light-secondary text-secondary'))) }}">
                                                 {{ $item->type }}
