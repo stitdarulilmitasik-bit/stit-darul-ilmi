@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use PDF;
 use App\Models\Dosen;
 use App\Models\Pengaturan\WebSetting;
 
@@ -24,6 +25,26 @@ class DosenController extends Controller
         $data['academy'] = $data['webs']->school_apps . ' by ' . $data['webs']->school_name;
         $data['dosen'] = Dosen::latest()->get();
         return view('master.pengguna.dosen-index', $data, compact('user'));
+    }
+
+
+    public function exportDosenPDF()
+    {
+        try {
+            $dosen = Dosen::latest()->get();
+
+            $data = [
+                'dosen' => $dosen,
+                'webs' => WebSetting::first(),
+            ];
+
+            $pdf = PDF::loadView('master.pengguna.dosen-pdf', $data)
+                ->setPaper('a4', 'landscape');
+
+            return $pdf->download('daftar-dosen-' . now()->format('Y-m-d') . '.pdf');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal export PDF dosen: ' . $e->getMessage());
+        }
     }
 
     public function viewDosen($code)
