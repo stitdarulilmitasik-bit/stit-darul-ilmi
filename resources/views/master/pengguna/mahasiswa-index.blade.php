@@ -279,7 +279,7 @@
                                     <th>Program Studi</th>
                                     <th>Semester</th>
                                     <th>Status</th>
-                                    <th>Keterangan Akademik</th>
+                                    <th>Semester / Periode</th>
                                     <th class="text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -305,17 +305,17 @@
                                                 {{ $item->type }}
                                             </span>
                                         </td>
-                                        <td data-label="Keterangan Akademik">
+                                        <td data-label="Semester / Periode">
                                             @php
                                                 $semester = (int) ($item->semester ?? 0);
                                                 $periode = $semester > 0 ? ($semester % 2 === 0 ? 'Genap' : 'Ganjil') : null;
                                                 $angkatan = $item->tahunAkademikRegistrasi?->name;
                                             @endphp
                                             <div class="d-flex flex-column gap-1">
-                                                @if ($item->raw_type == 4)
-                                                    <span class="badge bg-light-warning text-warning align-self-start"><i class="fas fa-pause-circle me-1"></i>Cuti</span>
-                                                @elseif ($periode)
-                                                    <span class="badge bg-light-primary text-primary align-self-start"><i class="fas fa-calendar-alt me-1"></i>{{ $periode }} · Semester {{ $semester }}</span>
+                                                @if ($semester > 0)
+                                                    <span class="badge bg-light-primary text-primary align-self-start">
+                                                        <i class="fas fa-layer-group me-1"></i>Semester {{ $semester }}{{ $periode ? ' · ' . $periode : '' }}
+                                                    </span>
                                                 @else
                                                     <span class="text-muted">Belum ada semester</span>
                                                 @endif
