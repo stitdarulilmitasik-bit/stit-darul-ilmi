@@ -176,6 +176,7 @@ use Illuminate\Support\Facades\Route;
 
     // MASTER PENGGUNA => MAHASISWA
     Route::get('/pengguna/mahasiswa',[App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'renderMahasiswa'])->name('pengguna.mahasiswa-render');
+    Route::get('/pengguna/mahasiswa/export/pdf',[App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'exportMahasiswaPDF'])->name('pengguna.mahasiswa-export-pdf');
     Route::get('/pengguna/mahasiswa/{code}/views',[App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'viewMahasiswa'])->name('pengguna.mahasiswa-views');
     Route::post('/pengguna/mahasiswa',[App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'handleMahasiswa'])->name('pengguna.mahasiswa-handle');
     Route::patch('/pengguna/mahasiswa/{code}',[App\Http\Controllers\Master\Pengguna\MahasiswaController::class, 'updateMahasiswa'])->name('pengguna.mahasiswa-update');
