@@ -163,12 +163,53 @@
                         <a href="{{ route($spref . 'pengguna.mahasiswa-export-excel') }}" class="btn btn-success btn-sm">
                             <i class="fas fa-file-excel me-1"></i> Export Excel
                         </a>
+                        <button class="btn btn-warning btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseImportMahasiswa" aria-expanded="false" aria-controls="collapseImportMahasiswa">
+                            <i class="fas fa-file-import me-1"></i> Import Excel
+                        </button>
                     </div>
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
                         <i class="fas fa-plus-circle me-2"></i>Tambah Mahasiswa
                     </button>
                 </div>
                 <div class="card-body">
+                    <div class="collapse mb-4" id="collapseImportMahasiswa">
+                        <div class="card border border-warning">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h6 class="mb-1"><i class="fas fa-file-import me-2"></i>Import Data Mahasiswa</h6>
+                                        <small class="text-muted">Gunakan template Excel agar nama kolom sesuai dengan sistem.</small>
+                                    </div>
+                                    <a href="{{ route($spref . 'pengguna.mahasiswa-import-template') }}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-download me-1"></i> Download Template
+                                    </a>
+                                </div>
+                                <form action="{{ route($spref . 'pengguna.mahasiswa-import-excel') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="row align-items-end">
+                                        <div class="col-md-9 mb-2">
+                                            <label for="import_mahasiswa_file" class="form-label">File Excel</label>
+                                            <input type="file" class="form-control" name="file" id="import_mahasiswa_file" accept=".xlsx,.xls,.csv" required>
+                                            <small class="text-muted">Maksimal 10 MB. Format: XLSX, XLS, atau CSV.</small>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <button type="submit" class="btn btn-warning w-100">
+                                                <i class="fas fa-upload me-1"></i> Mulai Import
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="alert alert-info mt-3 mb-0">
+                                    <small>
+                                        <strong>Catatan:</strong> Data dicocokkan berdasarkan NIM. Jika NIM sudah ada, data akan diperbarui.
+                                        Jika NIM belum ada, mahasiswa baru dibuat. Program Studi harus sama dengan nama Program Studi di sistem.
+                                        Untuk mahasiswa baru, Email dan Nomor Telepon wajib diisi. Jika Password dikosongkan, Password awal menggunakan NIM.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Quick Stats -->
                     <div class="row mb-4">
                         <div class="col-md-6 mb-2">
