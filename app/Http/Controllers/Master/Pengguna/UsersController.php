@@ -18,6 +18,19 @@ use App\Models\Pengaturan\WebSetting;
 
 class UsersController extends Controller
 {
+    /**
+     * Hanya Web Administrator (type 0) yang boleh mengelola akun User.
+     * Staff/Operator hanya memiliki akses baca pada halaman Pengguna.
+     */
+    private function ensureAdministrator(): void
+    {
+        abort_unless(
+            (int) Auth::guard('web')->user()?->type === 0,
+            403,
+            'Akses pengelolaan pengguna hanya untuk Administrator.'
+        );
+    }
+
     public function renderUsers()
     {
         $user = Auth::guard('web')->user();
@@ -191,6 +204,8 @@ class UsersController extends Controller
 
     public function handleUsers(Request $request)
     {
+        $this->ensureAdministrator();
+
         try {
             DB::beginTransaction();
             
@@ -225,6 +240,8 @@ class UsersController extends Controller
 
     public function updateUsers(Request $request, $code)
     {
+        $this->ensureAdministrator();
+
         try {
             DB::beginTransaction();
             
@@ -263,6 +280,8 @@ class UsersController extends Controller
 
     public function deleteUsers($code)
     {
+        $this->ensureAdministrator();
+
         $currentUserId = Auth::guard('web')->id();
 
         try {
@@ -272,9 +291,8 @@ class UsersController extends Controller
 
             $user = User::where('code', $code)->firstOrFail();
 
-            // Operator/staff pada area web tetap diperbolehkan menghapus
-            // akun User lain, termasuk Administrator dan staff departemen lain.
-            // Yang tidak boleh dihapus adalah akun yang sedang digunakan.
+            // Hanya Administrator yang sampai ke method ini. Akun sendiri
+            // tetap dilindungi agar tidak terhapus secara tidak sengaja.
             if ((int) $user->id === (int) $currentUserId) {
                 return redirect()->back()->with('error', 'Tidak dapat menghapus akun yang sedang digunakan');
             }
