@@ -38,6 +38,30 @@
             padding: 1.5rem;
         }
 
+        /* Mahasiswa action buttons */
+        .mahasiswa-header {
+            display: block !important;
+        }
+
+        .mahasiswa-action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .mahasiswa-action-btn {
+            min-width: 140px;
+            height: 38px;
+            padding: 0.5rem 0.75rem !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            flex: 0 0 auto;
+        }
+
         /* Table styling */
         .table {
             margin-bottom: 0;
@@ -108,6 +132,10 @@
                 align-items: flex-end !important;
                 text-align: right;
             }
+
+            .mahasiswa-action-btn {
+                min-width: 135px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -154,25 +182,28 @@
         <!-- Main Content -->
         <div class="col-lg-8 col-12 mb-2">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2">
+                <div class="card-header mahasiswa-header">
+                    <div class="d-flex align-items-center">
                         <h5 class="mb-0">{{ $pages }}</h5>
-                        <a href="{{ route($spref . 'pengguna.mahasiswa-export-pdf') }}" class="btn btn-danger btn-sm" target="_blank">
+                    </div>
+
+                    <div class="mahasiswa-action-row">
+                        <a href="{{ route($spref . 'pengguna.mahasiswa-export-pdf') }}" class="btn btn-danger mahasiswa-action-btn" target="_blank">
                             <i class="fas fa-file-pdf me-1"></i> Export PDF
                         </a>
-                        <a href="{{ route($spref . 'pengguna.mahasiswa-export-excel') }}" class="btn btn-success btn-sm">
+                        <a href="{{ route($spref . 'pengguna.mahasiswa-export-excel') }}" class="btn btn-success mahasiswa-action-btn">
                             <i class="fas fa-file-excel me-1"></i> Export Excel
                         </a>
-                        <a href="{{ route($spref . 'pengguna.mahasiswa-export-full-excel') }}" class="btn btn-dark btn-sm" title="Export seluruh isi tabel mahasiswas">
+                        <a href="{{ route($spref . 'pengguna.mahasiswa-export-full-excel') }}" class="btn btn-dark mahasiswa-action-btn" title="Export seluruh isi tabel mahasiswas">
                             <i class="fas fa-database me-1"></i> Export Full Excel
                         </a>
-                        <button class="btn btn-warning btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseImportMahasiswa" aria-expanded="false" aria-controls="collapseImportMahasiswa">
+                        <button class="btn btn-warning mahasiswa-action-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseImportMahasiswa" aria-expanded="false" aria-controls="collapseImportMahasiswa">
                             <i class="fas fa-file-import me-1"></i> Import Excel
                         </button>
+                        <button class="btn btn-primary mahasiswa-action-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
+                            <i class="fas fa-plus-circle me-1"></i>Tambah Mahasiswa
+                        </button>
                     </div>
-                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
-                        <i class="fas fa-plus-circle me-2"></i>Tambah Mahasiswa
-                    </button>
                 </div>
                 <div class="card-body">
                     <div class="collapse mb-4" id="collapseImportMahasiswa">
