@@ -4,28 +4,27 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class isActive
 {
     /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * Memastikan akun pada guard yang sedang dipakai berstatus aktif.
+     * Middleware ini sengaja tidak mencari user dari guard lain.
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Cek apakah pengguna sudah login
-        if (auth()->check()) {
-            // Jika sudah login, cek tipe pengguna
-            if(auth()->user()->status == 1){
-                return $next($request);
-            }
+        $user = Auth::user();
 
-            return redirect()->route('error.access');
+        if (!$user) {
+            return redirect()->route('auth.render-signin');
         }
 
-        // Jika belum login, arahkan ke rute 'auth-login'
-        return redirect()->route('admin.auth-signin-page');
+        if ((int) $user->status === 1) {
+            return $next($request);
+        }
+
+        return redirect()->route('error.access');
     }
 }
