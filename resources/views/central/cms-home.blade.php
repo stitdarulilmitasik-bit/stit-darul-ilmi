@@ -427,7 +427,7 @@ body.cms-front-page .page-body > .container-xl{
             <div class="container-xl cms-hero-inner">
                 <div class="row align-items-center h-70">
                     <div class="col-lg-7 py-5">
-                        <span class="cms-kicker">STIT Darul Ilmi Tasikmalaya</span>
+                        <span class="cms-kicker" style="font-size:1.05rem;font-weight:900;padding:9px 15px;">SK Menteri Agama RI No. 536 Tahun 2026</span>
                         <h1>{{ $hero?->title ?: $webs->school_name }}</h1>
                         <p class="hero-subtitle">
                             {{ $hero?->subtitle ?: 'Membangun generasi berilmu, berakhlak, dan siap berkontribusi untuk masyarakat.' }}
