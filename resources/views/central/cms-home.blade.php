@@ -372,7 +372,15 @@ body.cms-front-page .page-body > .container-xl{
 <div class="cms-home">
     @php($hero=$sections->firstWhere('section_key','hero'))
     @php($about=$sections->firstWhere('section_key','about'))
-    @php($filledSections=$sections->where('section_key','!=','hero')->filter(fn($section)=>filled(trim((string)$section->title)) || filled(trim((string)$section->subtitle)) || filled(trim((string)$section->content)) || filled(trim((string)$section->button_url)) || filled(trim((string)$section->image)))
+    @php
+        $filledSections = $sections->where('section_key', '!=', 'hero')->filter(function ($section) {
+            return filled(trim((string) $section->title))
+                || filled(trim((string) $section->subtitle))
+                || filled(trim((string) $section->content))
+                || filled(trim((string) $section->button_url))
+                || filled(trim((string) $section->image));
+        });
+    @endphp
 
     <div class="cms-hero-wrap">
         <section class="cms-hero">
