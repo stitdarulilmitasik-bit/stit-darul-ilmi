@@ -17,7 +17,7 @@ class DosenController extends Controller
 {
     public function renderDosen()
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
         $data['webs'] = WebSetting::first();
         $data['spref'] = $user ? $user->prefix : '';
         $data['menus'] = "Master";
@@ -49,7 +49,7 @@ class DosenController extends Controller
 
     public function viewDosen($code)
     {
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
         $data['webs'] = WebSetting::first();
         $data['spref'] = $user ? $user->prefix : '';
         $data['menus'] = "Master";
@@ -151,10 +151,10 @@ class DosenController extends Controller
                 $updateData['domicile_province'] = $request->ktp_province;
                 $updateData['domicile_poscode'] = $request->ktp_poscode;
             }
-            $updateData['updated_by'] = Auth::id();
+            $updateData['updated_by'] = Auth::guard('web')->id();
             $dosen->update($updateData);
             DB::commit();
-            $spref = Auth::user() ? Auth::user()->prefix : '';
+            $spref = Auth::guard('web')->user() ? Auth::guard('web')->user()->prefix : '';
             return redirect()->route($spref . 'pengguna.dosen-views', $code)->with('success', 'Profile berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -183,10 +183,10 @@ class DosenController extends Controller
                 'code' => $code,
                 'type' => $request->type,
                 'status_dosen' => $request->status_dosen,
-                'created_by' => Auth::id()
+                'created_by' => Auth::guard('web')->id()
             ]);
             DB::commit();
-            $spref = Auth::user() ? Auth::user()->prefix : '';
+            $spref = Auth::guard('web')->user() ? Auth::guard('web')->user()->prefix : '';
             return redirect()->route($spref . 'pengguna.dosen-render')->with('success', 'Dosen berhasil ditambahkan');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -213,14 +213,14 @@ class DosenController extends Controller
                 'phone' => $request->phone,
                 'type' => $request->type,
                 'status_dosen' => $request->status_dosen,
-                'updated_by' => Auth::id()
+                'updated_by' => Auth::guard('web')->id()
             ];
             if ($request->filled('password')) {
                 $updateData['password'] = Hash::make($request->password);
             }
             $dosen->update($updateData);
             DB::commit();
-            $spref = Auth::user() ? Auth::user()->prefix : '';
+            $spref = Auth::guard('web')->user() ? Auth::guard('web')->user()->prefix : '';
             return redirect()->route($spref . 'pengguna.dosen-render')->with('success', 'Data dosen berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -233,10 +233,10 @@ class DosenController extends Controller
         try {
             DB::beginTransaction();
             $dosen = Dosen::where('code', $code)->firstOrFail();
-            if ($dosen->id === Auth::id()) {
+            if ($dosen->id === Auth::guard('web')->id()) {
                 return redirect()->back()->with('error', 'Tidak dapat menghapus akun sendiri');
             }
-            $dosen->update(['deleted_by' => Auth::id()]);
+            $dosen->update(['deleted_by' => Auth::guard('web')->id()]);
             $dosen->delete();
             DB::commit();
             return redirect()->back()->with('success', 'Dosen berhasil dihapus');
