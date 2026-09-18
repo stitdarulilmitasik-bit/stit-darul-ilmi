@@ -16,6 +16,7 @@ use App\Models\Mahasiswa;
 use App\Models\Akademik\ProgramStudi;
 use App\Models\Pengaturan\WebSetting;
 use App\Exports\MahasiswaExport;
+use App\Exports\MahasiswaFullExport;
 use App\Exports\MahasiswaImportTemplate;
 use App\Imports\MahasiswaImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -63,6 +64,14 @@ class MahasiswaController extends Controller
         return Excel::download(
             new MahasiswaExport(),
             'data-mahasiswa-' . now()->format('Y-m-d') . '.xlsx'
+        );
+    }
+
+    public function exportMahasiswaFullExcel()
+    {
+        return Excel::download(
+            new MahasiswaFullExport(),
+            'export-full-mahasiswa-' . now()->format('Y-m-d') . '.xlsx'
         );
     }
 
