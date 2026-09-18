@@ -2,14 +2,14 @@
 
 @section('custom-css')
 <style>
-.cms-hero{border-radius:28px;overflow:hidden;background:linear-gradient(135deg,#0b5ed7,#163d7a);color:#fff}.cms-hero .logo{max-height:230px;object-fit:contain}.cms-card{height:100%;border:0;border-radius:18px;box-shadow:0 8px 28px rgba(0,0,0,.07)}.cms-card img{height:190px;object-fit:cover}.cms-title{font-weight:800}.cms-section{padding:4rem 0}.agenda{border-left:4px solid var(--tblr-primary);padding-left:1rem;margin-bottom:1.25rem}.admin-note{font-size:.8rem;opacity:.7}
+.cms-hero{border-radius:28px;overflow:hidden;background:linear-gradient(135deg,#0b5ed7,#163d7a);color:#fff}.cms-hero .logo{max-height:230px;object-fit:contain}.cms-card{height:100%;border:0;border-radius:18px;box-shadow:0 8px 28px rgba(0,0,0,.07)}.cms-card img{height:190px;object-fit:cover}.cms-title{font-weight:800}.cms-section{padding:1.75rem 0}.cms-section:first-of-type{padding-top:0}.cms-section:last-of-type{padding-bottom:1rem}.cms-section + .cms-section{margin-top:0}.agenda{border-left:4px solid var(--tblr-primary);padding-left:1rem;margin-bottom:1.25rem}.admin-note{font-size:.8rem;opacity:.7}
 </style>
 @endsection
 
 @section('content')
-<div class="container-xl py-4">
+<div class="container-xl pt-2 pb-4">
     @php($hero=$sections->firstWhere('section_key','hero'))
-    <section class="cms-hero p-4 p-lg-5 mb-5">
+    <section class="cms-hero p-4 p-lg-5 mb-4">
         <div class="row align-items-center g-4">
             <div class="col-lg-7">
                 <div class="text-uppercase fw-bold small opacity-75 mb-2">Sekolah Tinggi Ilmu Tarbiyah</div>
@@ -25,6 +25,7 @@
     </section>
 
     @foreach($sections->where('section_key','!=','hero') as $section)
+    @if($section->title || $section->subtitle || $section->content || $section->button_url || $section->image)
     <section class="cms-section border-bottom" id="{{ $section->section_key }}">
         <div class="row align-items-center g-4">
             <div class="col-lg-8">
@@ -37,6 +38,7 @@
             @if($section->image)<div class="col-lg-4"><img src="{{ $section->image }}" class="img-fluid rounded-4" alt="{{ $section->title }}"></div>@endif
         </div>
     </section>
+    @endif
     @endforeach
 
     <section class="cms-section">
