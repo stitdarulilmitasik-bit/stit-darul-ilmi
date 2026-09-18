@@ -160,6 +160,7 @@ use Illuminate\Support\Facades\Route;
 
     // MASTER PENGGUNA => USERS
     Route::get('/pengguna/users',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'renderUsers'])->name('pengguna.users-render');
+    Route::get('/pengguna/users/export/pdf',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'exportUsersPDF'])->name('pengguna.users-export-pdf');
     Route::get('/pengguna/users/{code}/views',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'viewUsers'])->name('pengguna.users-views');
     Route::post('/pengguna/users',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'handleUsers'])->name('pengguna.users-handle');
     Route::patch('/pengguna/users/{code}',[App\Http\Controllers\Master\Pengguna\UsersController::class, 'updateUsers'])->name('pengguna.users-update');
@@ -168,6 +169,7 @@ use Illuminate\Support\Facades\Route;
 
     // MASTER PENGGUNA => DOSEN
     Route::get('/pengguna/dosen',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'renderDosen'])->name('pengguna.dosen-render');
+    Route::get('/pengguna/dosen/export/pdf',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'exportDosenPDF'])->name('pengguna.dosen-export-pdf');
     Route::get('/pengguna/dosen/{code}/views',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'viewDosen'])->name('pengguna.dosen-views');
     Route::post('/pengguna/dosen',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'handleDosen'])->name('pengguna.dosen-handle');
     Route::patch('/pengguna/dosen/{code}',[App\Http\Controllers\Master\Pengguna\DosenController::class, 'updateDosen'])->name('pengguna.dosen-update');
