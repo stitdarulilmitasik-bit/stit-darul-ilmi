@@ -2,14 +2,14 @@
 
 @section('custom-css')
 <style>
-.cms-hero{border-radius:28px;overflow:hidden;background:linear-gradient(135deg,#0b5ed7,#163d7a);color:#fff}.cms-hero .logo{max-height:230px;object-fit:contain}.cms-card{height:100%;border:0;border-radius:18px;box-shadow:0 8px 28px rgba(0,0,0,.07)}.cms-card img{height:190px;object-fit:cover}.cms-title{font-weight:800}.cms-section{padding:1.75rem 0}.cms-section:first-of-type{padding-top:0}.cms-section:last-of-type{padding-bottom:1rem}.cms-section + .cms-section{margin-top:0}.agenda{border-left:4px solid var(--tblr-primary);padding-left:1rem;margin-bottom:1.25rem}.admin-note{font-size:.8rem;opacity:.7}
+.cms-hero{border-radius:28px;overflow:hidden;background:linear-gradient(135deg,#0b5ed7,#163d7a);color:#fff}.cms-hero .logo{max-height:230px;object-fit:contain}.cms-card{height:100%;border:0;border-radius:18px;box-shadow:0 8px 28px rgba(0,0,0,.07)}.cms-card img{height:190px;object-fit:cover}.cms-title{font-weight:800}.cms-section{padding:0 0 1.25rem;margin:0}.cms-section:first-of-type{padding-top:0}.cms-section:last-of-type{padding-bottom:.5rem}.cms-section + .cms-section{margin-top:0}.agenda{border-left:4px solid var(--tblr-primary);padding-left:1rem;margin-bottom:1.25rem}.admin-note{font-size:.8rem;opacity:.7}
 </style>
 @endsection
 
 @section('content')
-<div class="container-xl pt-2 pb-4">
+<div class="container-xl pt-0 pb-2">
     @php($hero=$sections->firstWhere('section_key','hero'))
-    <section class="cms-hero p-4 p-lg-5 mb-4">
+    <section class="cms-hero p-4 p-lg-5 mb-3">
         <div class="row align-items-center g-4">
             <div class="col-lg-7">
                 <div class="text-uppercase fw-bold small opacity-75 mb-2">Sekolah Tinggi Ilmu Tarbiyah</div>
@@ -25,7 +25,7 @@
     </section>
 
     @foreach($sections->where('section_key','!=','hero') as $section)
-    @if($section->title || $section->subtitle || $section->content || $section->button_url || $section->image)
+    @if(filled(trim((string) $section->title)) || filled(trim((string) $section->subtitle)) || filled(trim((string) $section->content)) || filled(trim((string) $section->button_url)) || filled(trim((string) $section->image)))
     <section class="cms-section border-bottom" id="{{ $section->section_key }}">
         <div class="row align-items-center g-4">
             <div class="col-lg-8">
@@ -42,7 +42,7 @@
     @endforeach
 
     <section class="cms-section">
-        <div class="row g-4">
+        <div class="row g-3">
             <div class="col-md-4"><div class="card cms-card"><div class="card-body"><div class="text-secondary">Program Studi</div><div class="display-6 fw-bold">{{ $programStudis->count() }}</div></div></div></div>
             <div class="col-md-4"><div class="card cms-card"><div class="card-body"><div class="text-secondary">Berita</div><div class="display-6 fw-bold">{{ $beritas->count() }}</div></div></div></div>
             <div class="col-md-4"><div class="card cms-card"><div class="card-body"><div class="text-secondary">Agenda Akademik</div><div class="display-6 fw-bold">{{ $kalender->count() }}</div></div></div></div>
@@ -51,7 +51,7 @@
 
     <section class="cms-section pt-0">
         <div class="d-flex justify-content-between align-items-center mb-4"><h2 class="cms-title mb-0">Program Studi</h2><a href="{{ route('root.prodi-index') }}" class="btn btn-outline-primary">Lihat Semua</a></div>
-        <div class="row g-4">
+        <div class="row g-3">
             @forelse($programStudis as $prodi)<div class="col-md-6 col-lg-4"><div class="card cms-card"><div class="card-body"><span class="badge bg-primary-lt mb-2">{{ $prodi->level }}</span><h3 class="h4">{{ $prodi->name }}</h3><p class="text-secondary mb-0">{{ $prodi->fakultas?->name }}</p></div></div></div>@empty<div class="col-12"><div class="alert alert-info">Belum ada program studi aktif.</div></div>@endforelse
         </div>
     </section>
