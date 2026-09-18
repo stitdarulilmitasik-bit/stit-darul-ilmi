@@ -1,3 +1,7 @@
+@php
+    $layoutUser = $layoutUser ?? $user ?? null;
+@endphp
+
 <ul class="navbar-nav pt-lg-3">
     <li class="nav-item">
         <a class="nav-link {{ Route::is($spref . 'dashboard-render', request()->path()) ? 'active' : '' }}" href="{{ route($spref . 'dashboard-render') }}">
@@ -16,9 +20,9 @@
         </a>
     </li>
 
-    @if ($user->prefix == 'web-admin.')
+    @if ($layoutUser && $layoutUser->prefix == 'web-admin.')
         @include('core-themes.components.navbar.web-admin')
-    @elseif ($user->prefix == 'mahasiswa.')
+    @elseif ($layoutUser && $layoutUser->prefix == 'mahasiswa.')
         @include('core-themes.components.navbar.mahasiswa')
     @elseif ($user->prefix == 'dosen.')
         @include('core-themes.components.navbar.dosen')
