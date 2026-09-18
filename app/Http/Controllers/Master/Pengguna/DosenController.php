@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Storage;
 use PDF;
 use App\Models\Dosen;
 use App\Models\Pengaturan\WebSetting;
+use App\Exports\DosenExport;
+use App\Exports\DosenFullExport;
+use App\Exports\DosenImportTemplate;
+use App\Imports\DosenImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DosenController extends Controller
 {
@@ -44,6 +49,40 @@ class DosenController extends Controller
             return $pdf->download('daftar-dosen-' . now()->format('Y-m-d') . '.pdf');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal export PDF dosen: ' . $e->getMessage());
+        }
+    }
+
+    public function exportDosenExcel()
+    {
+        return Excel::download(new DosenExport(), 'data-dosen-' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    public function exportDosenFullExcel()
+    {
+        return Excel::download(new DosenFullExport(), 'export-full-dosen-' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    public function downloadDosenImportTemplate()
+    {
+        return Excel::download(new DosenImportTemplate(), 'template-import-dosen.xlsx');
+    }
+
+    public function importDosenExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            Excel::import(new DosenImport(), $request->file('file'));
+            DB::commit();
+
+            return redirect()->route((Auth::guard('web')->user()->prefix ?? '') . 'pengguna.dosen-render')
+                ->with('success', 'Data dosen berhasil diimport.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Import dosen gagal: ' . $e->getMessage());
         }
     }
 
