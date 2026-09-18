@@ -155,7 +155,12 @@
         <div class="col-lg-8 col-12 mb-2">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">{{ $pages }}</h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="mb-0">{{ $pages }}</h5>
+                        <a href="{{ route($spref . 'pengguna.mahasiswa-export-pdf') }}" class="btn btn-danger btn-sm" target="_blank">
+                            <i class="fas fa-file-pdf me-1"></i> Export PDF
+                        </a>
+                    </div>
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
                         <i class="fas fa-plus-circle me-2"></i>Tambah Mahasiswa
                     </button>
@@ -290,7 +295,7 @@
                                             </div>
                                         </td>
                                         <td data-label="NIM">{{ $item->numb_nim ?? '-' }}</td>
-                                        <td data-label="Program Studi">{{ $item->prodi->name ?? '-' }}</td>
+                                        <td data-label="Program Studi">{{ $item->programStudi->name ?? '-' }}</td>
                                         <td data-label="Semester">{{ $item->semester }}</td>
                                         <td data-label="Status">
                                             <span class="badge {{ $item->raw_type == 1 ? 'bg-light-success text-success' : ($item->raw_type == 0 ? 'bg-light-info text-info' : ($item->raw_type == 2 ? 'bg-light-warning text-warning' : 'bg-light-secondary text-secondary')) }}">
@@ -353,7 +358,7 @@
                                             <small class="text-muted">{{ $mhs->created_at->diffForHumans() }}</small>
                                         </div>
                                         <p class="mb-1">{{ $mhs->numb_nim }}</p>
-                                        <small class="text-muted">{{ $mhs->prodi->name ?? '-' }}</small>
+                                        <small class="text-muted">{{ $mhs->programStudi->name ?? '-' }}</small>
                                     </div>
                                 @endforeach
                             </div>
