@@ -78,10 +78,21 @@
                 <div class="card-body">
                     <h2 class="mb-4">Web Settings</h2>
 
+                    @php
+                        $isAdministrator = (int) Auth::guard('web')->user()?->getRawOriginal('type') === 0;
+                    @endphp
+
+                    @if (!$isAdministrator)
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-eye me-2"></i>
+                            Mode <strong>View Only</strong>. Pengaturan Web hanya dapat diubah oleh Administrator.
+                        </div>
+                    @endif
+
                     <form action="{{ route($spref . 'pengaturan.web-settings-handle') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PATCH')
-
+                        <fieldset @disabled(!$isAdministrator)>
                         <div class="tab-content" id="settingsTabsContent">
                             <!-- Identity Tab -->
                             <div class="tab-pane fade show active" id="identity" role="tabpanel">
@@ -230,11 +241,17 @@
                         <div class="card-footer bg-transparent mt-4">
                             <div class="btn-list justify-content-end">
                                 <button type="button" class="btn btn-1" onclick="window.history.back()">Cancel</button>
-                                <button type="submit" class="btn btn-primary btn-2">Save Changes</button>
+                                @if ($isAdministrator)
+                                    <button type="submit" class="btn btn-primary btn-2">Save Changes</button>
+                                @else
+                                    <button type="button" class="btn btn-secondary btn-2" disabled>Save Changes</button>
+                                @endif
                             </div>
                         </div>
+                        </fieldset>
                     </form>
 
+                    @if ($isAdministrator)
                     <!-- Database Management Section - Moved outside main form -->
                     <div class="card mt-4">
                         <div class="card-header">
@@ -263,6 +280,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
