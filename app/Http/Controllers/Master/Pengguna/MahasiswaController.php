@@ -15,6 +15,8 @@ use PDF;
 use App\Models\Mahasiswa;
 use App\Models\Akademik\ProgramStudi;
 use App\Models\Pengaturan\WebSetting;
+use App\Exports\MahasiswaExport;
+use Maatwebsite\Excel\Facades\Excel;
 // Use Plugins
 
 class MahasiswaController extends Controller
@@ -52,6 +54,14 @@ class MahasiswaController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal export PDF mahasiswa: ' . $e->getMessage());
         }
+    }
+
+    public function exportMahasiswaExcel()
+    {
+        return Excel::download(
+            new MahasiswaExport(),
+            'data-mahasiswa-' . now()->format('Y-m-d') . '.xlsx'
+        );
     }
 
     public function viewMahasiswa($code)
