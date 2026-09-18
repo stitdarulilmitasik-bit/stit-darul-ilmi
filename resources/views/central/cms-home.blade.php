@@ -45,21 +45,7 @@ body.cms-front-page .page-body > .container-xl{
     border-top:7px solid var(--stit-green);
 }
 .cms-hero:before{
-    content:"";
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:0;
-    height:42px;
-    background:
-        radial-gradient(ellipse at 8% 100%,#5f9d27 0 28px,transparent 29px),
-        radial-gradient(ellipse at 18% 100%,#76b52d 0 34px,transparent 35px),
-        radial-gradient(ellipse at 30% 100%,#4f8d18 0 26px,transparent 27px),
-        radial-gradient(ellipse at 44% 100%,#7fbd38 0 35px,transparent 36px),
-        radial-gradient(ellipse at 60% 100%,#5f9d27 0 28px,transparent 29px),
-        radial-gradient(ellipse at 76% 100%,#76b52d 0 34px,transparent 35px),
-        radial-gradient(ellipse at 92% 100%,#4f8d18 0 30px,transparent 31px);
-    z-index:0;
+    content:none;
 }
 .cms-hero-inner{
     min-height:360px;
