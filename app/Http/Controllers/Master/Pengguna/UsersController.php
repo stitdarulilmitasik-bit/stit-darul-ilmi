@@ -263,27 +263,39 @@ class UsersController extends Controller
 
     public function deleteUsers($code)
     {
-        try {
-            DB::beginTransaction();
+        $currentUserId = Auth::guard('web')->id();
 
-            $user = User::where('code', $code)->firstOrFail();
-            
-            // Prevent self-deletion
-            if ($user->id === Auth::guard('web')->id()) {
-                return redirect()->back()->with('error', 'Tidak dapat menghapus akun sendiri');
+        try {
+            if (!$currentUserId) {
+                return redirect()->route('auth.render-signin');
             }
 
-            $user->update([
-                'deleted_by' => Auth::guard('web')->id()
-            ]);
-            $user->delete();
+            $user = User::where('code', $code)->firstOrFail();
 
-            DB::commit();
+            // Operator/staff pada area web tetap diperbolehkan menghapus
+            // akun User lain, termasuk Administrator dan staff departemen lain.
+            // Yang tidak boleh dihapus adalah akun yang sedang digunakan.
+            if ((int) $user->id === (int) $currentUserId) {
+                return redirect()->back()->with('error', 'Tidak dapat menghapus akun yang sedang digunakan');
+            }
+
+            DB::transaction(function () use ($user, $currentUserId) {
+                // Simpan pelaku penghapusan sebelum SoftDeletes.
+                $user->deleted_by = $currentUserId;
+                $user->saveQuietly();
+
+                // Model User menggunakan SoftDeletes, sehingga data tetap
+                // tersimpan dan dapat dipulihkan dari basis data bila diperlukan.
+                $user->delete();
+            });
+
             return redirect()->back()->with('success', 'Pengguna berhasil dihapus');
 
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal menghapus Pengguna: ' . $e->getMessage());
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'Pengguna tidak ditemukan atau sudah dihapus.');
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->back()->with('error', 'Gagal menghapus pengguna. Silakan periksa log aplikasi untuk detail kesalahan.');
         }
     }
 }
