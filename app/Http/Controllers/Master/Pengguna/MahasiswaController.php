@@ -36,7 +36,7 @@ class MahasiswaController extends Controller
     public function exportMahasiswaPDF()
     {
         try {
-            $mahasiswa = Mahasiswa::with(['programStudi.fakultas'])
+            $mahasiswa = Mahasiswa::with(['programStudi.fakultas', 'tahunAkademikRegistrasi'])
                 ->orderBy('name')
                 ->get();
 
