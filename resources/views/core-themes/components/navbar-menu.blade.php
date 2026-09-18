@@ -24,7 +24,7 @@
         @include('core-themes.components.navbar.web-admin')
     @elseif ($layoutUser && $layoutUser->prefix == 'mahasiswa.')
         @include('core-themes.components.navbar.mahasiswa')
-    @elseif ($user->prefix == 'dosen.')
+    @elseif ($layoutUser && $layoutUser->prefix == 'dosen.')
         @include('core-themes.components.navbar.dosen')
     @endif
 </ul>
